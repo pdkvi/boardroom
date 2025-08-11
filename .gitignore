@@ -1,0 +1,6 @@
+﻿# TODO: make CMakePresets.json available
+CMakePresets.json
+CMakeUserPresets.json
+
+.vs/
+out/
