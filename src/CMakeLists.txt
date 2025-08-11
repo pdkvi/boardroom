@@ -13,6 +13,9 @@
 
 	"WhiteboardView.hpp"
 	"WhiteboardView.cpp"
+
+	"Commands/DrawCommand.hpp"
+	"Commands/DrawCommand.cpp"
 )
 
 set_target_properties(boardroom PROPERTIES

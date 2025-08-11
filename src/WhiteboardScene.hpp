@@ -4,6 +4,8 @@
 
 #include "FreeHandDrawingItem.hpp"
 
+class QUndoStack;
+
 class WhiteboardScene : public QGraphicsScene
 {
 	Q_OBJECT
@@ -12,10 +14,13 @@ class WhiteboardScene : public QGraphicsScene
 	using this_t = WhiteboardScene;
 
 private:
+	QUndoStack* m_commandsStack = nullptr;
 	FreeHandDrawingItem* m_currentHandDrawItem = nullptr;
 
 public:
-	using base_t::base_t;
+	explicit WhiteboardScene(QObject* parent = nullptr);
+
+	QUndoStack* getCommandsStack() noexcept;
 
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

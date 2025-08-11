@@ -20,9 +20,9 @@
     </item>
    </layout>
   </widget>
-  <widget class="QDockWidget" name="sideDock">
+  <widget class="QDockWidget" name="historyDock">
    <property name="windowTitle">
-    <string>Side dock</string>
+    <string>History</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -30,7 +30,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="0" column="0">
-      <widget class="QListView" name="sideDockList"/>
+      <widget class="QUndoView" name="historyView"/>
      </item>
     </layout>
    </widget>
