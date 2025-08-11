@@ -166,7 +166,10 @@ void WhiteboardView::mousePressEvent(QMouseEvent* event)
 void WhiteboardView::mouseReleaseEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::MiddleButton)
+	{
 		m_isViewRectDragging = false;
+		return;
+	}
 
 	QGraphicsView::mouseReleaseEvent(event);
 }
