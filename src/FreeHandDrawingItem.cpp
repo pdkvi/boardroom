@@ -16,9 +16,6 @@ QRectF FreeHandDrawingItem::boundingRect() const
 void FreeHandDrawingItem::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
 {
 	painter->drawPath(m_path);
-
-	painter->setPen(Qt::blue);
-	painter->drawRect(m_path.boundingRect());
 }
 
 void FreeHandDrawingItem::moveTo(QPointF const& pt)

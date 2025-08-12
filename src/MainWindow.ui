@@ -35,6 +35,37 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>706</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="debugMenu">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <widget class="QMenu" name="whiteboardViewDebugMenu">
+     <property name="title">
+      <string>WhiteboardView</string>
+     </property>
+     <addaction name="whiteboardViewDebugRenderingAction"/>
+    </widget>
+    <addaction name="whiteboardViewDebugMenu"/>
+   </widget>
+   <addaction name="debugMenu"/>
+  </widget>
+  <action name="whiteboardViewDebugRenderingAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug rendering</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
