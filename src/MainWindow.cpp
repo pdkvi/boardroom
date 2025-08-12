@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget* parent)
 
 	auto* scene = qobject_cast<WhiteboardScene*>(m_ui->whiteboardView->scene());
 	m_ui->historyView->setStack(scene->getCommandsStack());
+
+	connect(m_ui->whiteboardViewDebugRenderingAction, &QAction::toggled,
+		m_ui->whiteboardView, &WhiteboardView::setDebugRenderingEnabled);
 }
 
 MainWindow::~MainWindow()

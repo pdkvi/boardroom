@@ -5,7 +5,7 @@
 #include "WhiteboardScene.hpp"
 
 WhiteboardView::WhiteboardView(QWidget* parent)
-	: base_t(parent), m_isViewRectDragging(false)
+	: base_t(parent), m_isViewRectDragging(false), m_hasDebugRendering(false)
 {
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -20,6 +20,11 @@ WhiteboardView::WhiteboardView(QWidget* parent)
 
 		update();
 	});
+}
+
+void WhiteboardView::setDebugRenderingEnabled(bool value)
+{
+	m_hasDebugRendering = value;
 }
 
 void WhiteboardView::syncViewRectWithScene()
@@ -76,11 +81,10 @@ void WhiteboardView::syncViewRectWithScreen()
 	setSceneRect({ topLeft, bottomRight });
 }
 
-void WhiteboardView::paintEvent(QPaintEvent* event)
+void WhiteboardView::renderDebugInformation(QPainter& painter) const
 {
-	base_t::paintEvent(event);
-
-	QPainter painter(viewport());
+	if (m_hasDebugRendering == false)
+		return;
 
 	painter.setPen(Qt::red);
 	painter.drawPolygon(mapFromScene(m_sceneRect));
@@ -95,7 +99,7 @@ void WhiteboardView::paintEvent(QPaintEvent* event)
 		.arg(viewRect.bottom())
 		.arg(viewRect.right());
 
-	QRectF const screenRect = mapToScene(QRect{0, 0, width(), height()}).boundingRect();
+	QRectF const screenRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
 	auto const screenRectStr = QString("screen rect: LEFT = %1, TOP = %2, BOTTOM = %3, RIGHT = %4")
 		.arg(screenRect.left())
 		.arg(screenRect.top())
@@ -114,6 +118,14 @@ void WhiteboardView::paintEvent(QPaintEvent* event)
 	painter.setPen(Qt::lightGray);
 	QRect const screenStrRect = fm.boundingRect(screenRectStr).toRect();
 	painter.drawText((width() - screenStrRect.width()) / 2, viewStrRect.height() + screenStrRect.height(), screenRectStr);
+}
+
+void WhiteboardView::paintEvent(QPaintEvent* event)
+{
+	base_t::paintEvent(event);
+
+	QPainter painter(viewport());
+	renderDebugInformation(painter);
 }
 
 void WhiteboardView::resizeEvent(QResizeEvent* event)

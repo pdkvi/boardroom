@@ -14,12 +14,18 @@ private:
 
 	QPoint m_lastMousePos;
 	bool m_isViewRectDragging;
+	bool m_hasDebugRendering;
 
 public:
 	explicit WhiteboardView(QWidget* parent = nullptr);
 
+	void setDebugRenderingEnabled(bool value);
+
 	void syncViewRectWithScene();
 	void syncViewRectWithScreen();
+
+private:
+	void renderDebugInformation(QPainter& painter) const;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
