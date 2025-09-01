@@ -11,6 +11,9 @@
 	"WhiteboardView.hpp"
 	"WhiteboardView.cpp"
 
+	"WhiteboardToolsModel.hpp"
+	"WhiteboardToolsModel.cpp"
+
 	"Commands/DrawCommand.hpp"
 	"Commands/DrawCommand.cpp"
 
