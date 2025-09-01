@@ -5,17 +5,33 @@
 	"MainWindow.cpp"
 	"MainWindow.ui"
 
-	"FreeHandDrawingItem.hpp"
-	"FreeHandDrawingItem.cpp"
-
 	"WhiteboardScene.hpp"
 	"WhiteboardScene.cpp"
 
 	"WhiteboardView.hpp"
 	"WhiteboardView.cpp"
 
+	"WhiteboardToolsModel.hpp"
+	"WhiteboardToolsModel.cpp"
+
 	"Commands/DrawCommand.hpp"
 	"Commands/DrawCommand.cpp"
+
+	"Tools/Core/ITool.hpp"
+	"Tools/Core/ToolBase.hpp"
+
+	"Tools/PenTool.hpp"
+	"Tools/PenTool.cpp"
+
+	"Items/Core/IToolItem.hpp"
+	"Items/Core/ToolItemBase.hpp"
+
+	"Items/FreeDrawingItem.hpp"
+	"Items/FreeDrawingItem.cpp"
+
+	"Utility/IdHolder.hpp"
+	"Utility/Registry.hpp"
+	"Utility/SingleCall.hpp"
 )
 
 set_target_properties(boardroom PROPERTIES
@@ -26,5 +42,7 @@ set_target_properties(boardroom PROPERTIES
 	WIN32_EXECUTABLE YES
 	MACOSX_BUNDLE YES
 )
+
+target_include_directories(boardroom PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(boardroom PRIVATE Qt::Core Qt::Gui Qt::Widgets)

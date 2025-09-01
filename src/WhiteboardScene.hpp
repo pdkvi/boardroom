@@ -2,8 +2,6 @@
 
 #include <QGraphicsScene>
 
-#include "FreeHandDrawingItem.hpp"
-
 class QUndoStack;
 
 class WhiteboardScene : public QGraphicsScene
@@ -15,7 +13,6 @@ class WhiteboardScene : public QGraphicsScene
 
 private:
 	QUndoStack* m_commandsStack = nullptr;
-	FreeHandDrawingItem* m_currentHandDrawItem = nullptr;
 
 public:
 	explicit WhiteboardScene(QObject* parent = nullptr);

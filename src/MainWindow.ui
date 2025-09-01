@@ -58,6 +58,21 @@
    </widget>
    <addaction name="debugMenu"/>
   </widget>
+  <widget class="QDockWidget" name="toolsDock">
+   <property name="windowTitle">
+    <string>Tools</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="0">
+      <widget class="QListView" name="toolsView"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="whiteboardViewDebugRenderingAction">
    <property name="checkable">
     <bool>true</bool>
