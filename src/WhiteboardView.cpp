@@ -1,11 +1,16 @@
 ﻿#include "WhiteboardView.hpp"
 
+#include <QActionGroup>
 #include <QWheelEvent>
+#include <QBoxLayout>
+#include <QMenu>
 
 #include "WhiteboardScene.hpp"
 
+#include "Items/Core/ToolItemBase.hpp"
+
 WhiteboardView::WhiteboardView(QWidget* parent)
-	: base_t(parent), m_isViewRectDragging(false), m_hasDebugRendering(false)
+	: base_t(parent), m_state(CurrentState::Nothing), m_hasDebugRendering(false)
 {
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -20,6 +25,16 @@ WhiteboardView::WhiteboardView(QWidget* parent)
 
 		update();
 	});
+}
+
+void WhiteboardView::setCurrentTool(std::unique_ptr<ITool>&& tool)
+{
+	m_currentTool = std::move(tool);
+}
+
+std::unique_ptr<ITool> const& WhiteboardView::getCurrentTool() const
+{
+	return m_currentTool;
 }
 
 void WhiteboardView::setDebugRenderingEnabled(bool value)
@@ -190,30 +205,95 @@ void WhiteboardView::wheelEvent(QWheelEvent* event)
 
 void WhiteboardView::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::MiddleButton)
+	switch (event->button())
 	{
-		m_lastMousePos = event->pos();
-		m_isViewRectDragging = true;
-		return;
+	case Qt::LeftButton:
+	{
+		if (m_currentTool == nullptr)
+			break;
+
+		m_state = CurrentState::Drawing;
+		m_currentItem = m_currentTool->createItem();
+		m_currentItem->startPath(mapToScene(event->pos()));
+		scene()->addItem(m_currentItem->getSceneItem());
+		break;
 	}
 
+	case Qt::RightButton:
+	{
+		m_state = CurrentState::Nothing;
+
+		auto popup = new QMenu(this); // todo: leak ?
+		for (IToolItem::id_t id : m_currentTool->getAvailableItemsId())
+		{
+			std::shared_ptr<IToolItem const> item = ToolItemRegistry::getItem(id);
+
+			auto* action = new QAction(item->getName());
+			action->setCheckable(true);
+			action->setChecked(item->getId() == m_currentTool->getCurrentItemId());
+
+			connect(action, &QAction::triggered, [this, id]() { m_currentTool->setCurrentItemId(id); });
+
+			popup->addAction(action);
+		}
+
+		popup->setGeometry(QRect(mapToGlobal(event->pos()), popup->sizeHint()));
+		popup->show();
+
+		break;
+	}
+
+	case Qt::MiddleButton:
+	{
+		m_state = CurrentState::Moving;
+		break;
+	}
+
+	default:
+	{
+		m_state = CurrentState::Nothing;
+		break;
+	}
+	}
+
+	m_lastMousePos = event->pos();
 	QGraphicsView::mousePressEvent(event);
 }
 
 void WhiteboardView::mouseReleaseEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::MiddleButton)
+	switch (event->button())
 	{
-		m_isViewRectDragging = false;
-		return;
+	case Qt::LeftButton:
+	{
+		if (m_currentItem == nullptr)
+			break;
+
+		m_currentItem->endPath(mapToScene(event->pos()));
+		m_currentItem.release();
+
+		break;
 	}
 
+	default:
+		break;
+	}
+
+	m_state = CurrentState::Nothing;
 	QGraphicsView::mouseReleaseEvent(event);
 }
 
 void WhiteboardView::mouseMoveEvent(QMouseEvent* event)
 {
-	if (m_isViewRectDragging)
+	switch (m_state)
+	{
+	case CurrentState::Drawing:
+	{
+		m_currentItem->updatePath(mapToScene(event->pos()));
+		break;
+	}
+
+	case CurrentState::Moving:
 	{
 		setTransformationAnchor(QGraphicsView::NoAnchor);
 
@@ -243,7 +323,11 @@ void WhiteboardView::mouseMoveEvent(QMouseEvent* event)
 		translate(offset.x(), offset.y());
 
 		m_lastMousePos = mousePos;
-		return;
+		break;
+	}
+
+	default:
+		break;
 	}
 
 	base_t::mouseMoveEvent(event);
