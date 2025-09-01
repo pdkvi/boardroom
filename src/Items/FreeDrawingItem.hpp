@@ -13,10 +13,11 @@ private:
 public:
 	QString getName() const override;
 
-	void startPath(QPointF const& pos) override;
-	void updatePath(QPointF const& pos) override;
-	void endPath(QPointF const& pos) override;
+protected:
+	void startPathImpl(QPointF const& pos) override;
+	void updatePathImpl(QPointF const& pos) override;
+	void endPathImpl(QPointF const& pos) override;
 
-	QRectF boundingRect() const override;
-	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
+	QRectF boundingRectImpl() const override;
+	void paintImpl(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
 };
