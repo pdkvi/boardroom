@@ -20,6 +20,8 @@
 	"Tools/Core/ITool.hpp"
 	"Tools/Core/ToolBase.hpp"
 
+	"Tools/ShapeTool.hpp"
+	"Tools/ShapeTool.cpp"
 	"Tools/PenTool.hpp"
 	"Tools/PenTool.cpp"
 
@@ -28,11 +30,13 @@
 
 	"Items/FreeDrawingItem.hpp"
 	"Items/FreeDrawingItem.cpp"
+	"Items/RectangleItem.hpp"
+	"Items/RectangleItem.cpp"
 
 	"Utility/IdHolder.hpp"
 	"Utility/Registry.hpp"
 	"Utility/SingleCall.hpp"
-)
+ )
 
 set_target_properties(boardroom PROPERTIES
 	CXX_STANDARD 23
