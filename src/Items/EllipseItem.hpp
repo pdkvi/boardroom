@@ -2,13 +2,11 @@
 
 #include "Core/ToolItemBase.hpp"
 
-class FreeDrawingItem : public ToolItemBase<FreeDrawingItem>
+class EllipseItem : public ToolItemBase<EllipseItem>
 {
-	using base_t = ToolItemBase;
-	using this_t = FreeDrawingItem;
-
 private:
-	QPainterPath m_path;
+	QPointF m_startPt;
+	QPointF m_endPt;
 
 public:
 	QString getName() const override;

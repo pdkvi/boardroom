@@ -2,13 +2,14 @@
 
 #include "Core/ToolItemBase.hpp"
 
-class FreeDrawingItem : public ToolItemBase<FreeDrawingItem>
+class RectangleItem : public ToolItemBase<RectangleItem>
 {
 	using base_t = ToolItemBase;
-	using this_t = FreeDrawingItem;
+	using this_t = RectangleItem;
 
 private:
-	QPainterPath m_path;
+	QPointF m_startPt;
+	QPointF m_endPt;
 
 public:
 	QString getName() const override;

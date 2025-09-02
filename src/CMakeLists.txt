@@ -20,6 +20,8 @@
 	"Tools/Core/ITool.hpp"
 	"Tools/Core/ToolBase.hpp"
 
+	"Tools/ShapeTool.hpp"
+	"Tools/ShapeTool.cpp"
 	"Tools/PenTool.hpp"
 	"Tools/PenTool.cpp"
 
@@ -28,6 +30,14 @@
 
 	"Items/FreeDrawingItem.hpp"
 	"Items/FreeDrawingItem.cpp"
+	"Items/LineItem.hpp"
+	"Items/LineItem.cpp"
+	"Items/RectangleItem.hpp"
+	"Items/RectangleItem.cpp"
+	"Items/EllipseItem.hpp"
+	"Items/EllipseItem.cpp"
+	"Items/TriangleItem.hpp"
+	"Items/TriangleItem.cpp"
 
 	"Utility/IdHolder.hpp"
 	"Utility/Registry.hpp"

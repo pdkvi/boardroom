@@ -3,6 +3,7 @@
 #include "WhiteboardToolsModel.hpp"
 #include "WhiteboardScene.hpp"
 
+#include "Tools/ShapeTool.hpp"
 #include "Tools/PenTool.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	auto* toolsModel = new WhiteboardToolsModel;
 	toolsModel->addTool(PenTool::getToolId());
+	toolsModel->addTool(ShapeTool::getToolId());
 
 	m_ui->toolsView->setModel(toolsModel);
 

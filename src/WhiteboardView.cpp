@@ -223,7 +223,9 @@ void WhiteboardView::mousePressEvent(QMouseEvent* event)
 	{
 		m_state = CurrentState::Nothing;
 
-		auto popup = new QMenu(this); // todo: leak ?
+		auto* popup = new QMenu(this);
+		popup->setAttribute(Qt::WA_DeleteOnClose);
+
 		for (IToolItem::id_t id : m_currentTool->getAvailableItemsId())
 		{
 			std::shared_ptr<IToolItem const> item = ToolItemRegistry::getItem(id);
