@@ -1,7 +1,8 @@
 ﻿#include "PenTool.hpp"
 
-#include "Utility/SingleCall.hpp"
 #include "Items/FreeDrawingItem.hpp"
+
+#include "Utility/SingleCall.hpp"
 
 PenTool::PenTool()
 {

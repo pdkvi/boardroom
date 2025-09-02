@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Registry.hpp"
+#include "Utility/Registry.hpp"
 
 template <typename TBase, typename TItem>
 class IdHolder

@@ -3,7 +3,6 @@
 #include <unordered_set>
 #include <memory>
 
-#include <QString>
 #include <QIcon>
 
 #include "Items/Core/IToolItem.hpp"

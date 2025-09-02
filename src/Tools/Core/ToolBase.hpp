@@ -2,11 +2,12 @@
 
 #include <unordered_set>
 
-#include "Utility/IdHolder.hpp"
-#include "Utility/Registry.hpp"
-#include "ITool.hpp"
+#include "Tools/Core/ITool.hpp"
 
 #include "Items/Core/ToolItemBase.hpp"
+
+#include "Utility/IdHolder.hpp"
+#include "Utility/Registry.hpp"
 
 using ToolRegistry = Registry<ITool>;
 

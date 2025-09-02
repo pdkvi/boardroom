@@ -1,11 +1,12 @@
 ﻿#pragma once
 
-#include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <QGraphicsItem>
+
+#include "Items/Core/IToolItem.hpp"
 
 #include "Utility/IdHolder.hpp"
 #include "Utility/Registry.hpp"
-#include "IToolItem.hpp"
 
 using ToolItemRegistry = Registry<IToolItem>;
 

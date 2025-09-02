@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Core/ToolBase.hpp"
+#include "Tools/Core/ToolBase.hpp"
 
 class IToolItem;
 
