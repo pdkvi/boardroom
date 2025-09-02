@@ -2,21 +2,12 @@
 
 #include "Items/Core/ToolItemBase.hpp"
 
-class FreeDrawingItem : public ToolItemBase<FreeDrawingItem>
+class LineItem : public ToolItemBase<LineItem>
 {
-	using base_t = ToolItemBase;
-	using this_t = FreeDrawingItem;
-
-private:
-	QPainterPath m_path;
-
 public:
 	QString getName() const override;
 
 protected:
-	void onPathStart() override;
-	void onPathUpdate() override;
-
 	QRectF getLimitRect() const override;
 	void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
 };

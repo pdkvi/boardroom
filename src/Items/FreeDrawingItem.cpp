@@ -8,27 +8,22 @@ QString FreeDrawingItem::getName() const
 	return "Free drawing";
 }
 
-void FreeDrawingItem::startPathImpl(QPointF const& pos)
+void FreeDrawingItem::onPathStart()
 {
-	m_path.moveTo(pos);
+	m_path.moveTo(getStartPathPt());
 }
 
-void FreeDrawingItem::updatePathImpl(QPointF const& pos)
+void FreeDrawingItem::onPathUpdate()
 {
-	m_path.lineTo(pos);
+	m_path.lineTo(getCurrentPathPt());
 }
 
-void FreeDrawingItem::endPathImpl(QPointF const& pos)
-{
-	updatePathImpl(pos);
-}
-
-QRectF FreeDrawingItem::boundingRectImpl() const
+QRectF FreeDrawingItem::getLimitRect() const
 {
 	return m_path.boundingRect();
 }
 
-void FreeDrawingItem::paintImpl(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
+void FreeDrawingItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
 {
 	painter->drawPath(m_path);
 }

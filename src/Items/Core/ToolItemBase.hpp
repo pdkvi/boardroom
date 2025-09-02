@@ -15,7 +15,10 @@ class ToolItemBase : public QGraphicsItem, public IToolItem
 	using id_holder_t = IdHolder<IToolItem, TToolItem>;
 
 private:
-	QRectF m_boundingRectBeforeUpdate;
+	QPointF m_pathStartPt;
+	QPointF m_currentPathPt;
+
+	QRectF m_limitRectBeforeRepaint;
 
 public:
 	static id_t getToolItemId()
@@ -28,50 +31,54 @@ public:
 
 	std::unique_ptr<IToolItem> clone() const override { return std::make_unique<TToolItem>(); }
 
-	QGraphicsItem* getSceneItem() override { return this; }
+	QGraphicsItem* getSceneItem() final { return this; }
 
 	void startPath(QPointF const& pos) final
 	{
-		startPathImpl(pos);
+		m_pathStartPt = m_currentPathPt = pos;
+		onPathStart();
 
-		m_boundingRectBeforeUpdate = boundingRectImpl();
+		m_limitRectBeforeRepaint = getLimitRect();
 		update();
 	}
 
 	void updatePath(QPointF const& pos) final
 	{
-		updatePathImpl(pos);
+		m_currentPathPt = pos;
+		onPathUpdate();
+
 		update();
 	}
 
 	void endPath(QPointF const& pos) final
 	{
-		endPathImpl(pos);
+		m_currentPathPt = pos;
+		onPathEnd();
 
 		if (QGraphicsScene* scene = this->scene())
 		{
-			scene->removeItem(this);
-			scene->addItem(this);
+			scene->removeItem(getSceneItem());
+			scene->addItem(getSceneItem());
 			scene->update();
 		}
 	}
 
-	QRectF boundingRect() const final
-	{
-		return m_boundingRectBeforeUpdate;
-	}
+	QRectF boundingRect() const final { return m_limitRectBeforeRepaint; }
 
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) final
 	{
-		paintImpl(painter, option, widget);
-		m_boundingRectBeforeUpdate = boundingRectImpl();
+		onPaint(painter, option, widget);
+		m_limitRectBeforeRepaint = getLimitRect();
 	}
 
 protected:
-	virtual void startPathImpl(QPointF const& pos) = 0;
-	virtual void updatePathImpl(QPointF const& pos) = 0;
-	virtual void endPathImpl(QPointF const& pos) = 0;
+	virtual void onPathStart() {}
+	virtual void onPathUpdate() {}
+	virtual void onPathEnd() { onPathUpdate(); }
 
-	virtual QRectF boundingRectImpl() const = 0;
-	virtual void paintImpl(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) = 0;
+	QPointF getStartPathPt() const { return m_pathStartPt; }
+	QPointF getCurrentPathPt() const { return m_currentPathPt; }
+
+	virtual QRectF getLimitRect() const = 0;
+	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) = 0;
 };

@@ -1,9 +1,9 @@
 ﻿#include "ShapeTool.hpp"
 
-#include "Items/RectangleItem.hpp"
-#include "Items/EllipseItem.hpp"
-#include "Items/LineItem.hpp"
-#include "Items/TriangleItem.hpp"
+#include "Items/Shapes/RectangleItem.hpp"
+#include "Items/Shapes/EllipseItem.hpp"
+#include "Items/Shapes/LineItem.hpp"
+#include "Items/Shapes/TriangleItem.hpp"
 
 #include "Utility/SingleCall.hpp"
 
