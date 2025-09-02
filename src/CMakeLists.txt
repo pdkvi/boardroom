@@ -30,13 +30,19 @@
 
 	"Items/FreeDrawingItem.hpp"
 	"Items/FreeDrawingItem.cpp"
+	"Items/LineItem.hpp"
+	"Items/LineItem.cpp"
 	"Items/RectangleItem.hpp"
 	"Items/RectangleItem.cpp"
+	"Items/EllipseItem.hpp"
+	"Items/EllipseItem.cpp"
+	"Items/TriangleItem.hpp"
+	"Items/TriangleItem.cpp"
 
 	"Utility/IdHolder.hpp"
 	"Utility/Registry.hpp"
 	"Utility/SingleCall.hpp"
- )
+)
 
 set_target_properties(boardroom PROPERTIES
 	CXX_STANDARD 23

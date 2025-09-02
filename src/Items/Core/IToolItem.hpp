@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <QString>
+#include <QPointF>
+
 class QGraphicsItem;
 
 class IToolItem
