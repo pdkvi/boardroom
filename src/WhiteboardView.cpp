@@ -18,6 +18,9 @@ WhiteboardView::WhiteboardView(QWidget* parent)
 	auto* scene = new WhiteboardScene;
 	setScene(scene);
 
+	m_minimap = new SceneMinimap(this);
+	m_minimap->setTargetView(this);
+
 	connect(scene, &QGraphicsScene::sceneRectChanged, this, [this](QRectF const& rect)
 	{
 		m_sceneRect = rect;
@@ -146,6 +149,12 @@ void WhiteboardView::paintEvent(QPaintEvent* event)
 void WhiteboardView::resizeEvent(QResizeEvent* event)
 {
 	syncViewRectWithScreen();
+
+	double const maxDim = std::clamp(std::max(width(), height()) / 10, 120, 220);
+
+	m_minimap->resize(maxDim, maxDim);
+	m_minimap->move(width() - m_minimap->width(), 0);
+
 	base_t::resizeEvent(event);
 }
 

@@ -2,6 +2,8 @@
 
 #include <QGraphicsView>
 
+#include "SceneMinimap.hpp"
+
 #include "Items/Core/IToolItem.hpp"
 
 #include "Tools/Core/ITool.hpp"
@@ -29,6 +31,8 @@ private:
 
 	std::unique_ptr<ITool> m_currentTool;
 	std::unique_ptr<IToolItem> m_currentItem;
+
+	SceneMinimap* m_minimap;
 
 public:
 	explicit WhiteboardView(QWidget* parent = nullptr);
