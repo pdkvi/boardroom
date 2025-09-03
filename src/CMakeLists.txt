@@ -14,6 +14,9 @@
 	"WhiteboardToolsModel.hpp"
 	"WhiteboardToolsModel.cpp"
 
+	"SceneMinimap.hpp"
+	"SceneMinimap.cpp"
+
 	"Commands/DrawCommand.hpp"
 	"Commands/DrawCommand.cpp"
 
