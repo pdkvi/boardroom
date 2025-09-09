@@ -1,9 +1,12 @@
-﻿add_executable(boardroom
+add_executable(boardroom
 	"main.cpp"
 
 	"MainWindow.hpp"
 	"MainWindow.cpp"
 	"MainWindow.ui"
+
+	"InfiniteScrollGraphicsViewBase.hpp"
+	"InfiniteScrollGraphicsViewBase.cpp"
 
 	"WhiteboardScene.hpp"
 	"WhiteboardScene.cpp"
