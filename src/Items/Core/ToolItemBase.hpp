@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QPainter>
 
 #include "Items/Core/IToolItem.hpp"
 
@@ -22,6 +23,11 @@ private:
 	QRectF m_limitRectBeforeRepaint;
 
 public:
+	ToolItemBase()
+	{
+		setFlag(ItemIsSelectable);
+	}
+
 	static id_t getToolItemId()
 	{
 		auto const & holder = id_holder_t::getInstance();
@@ -80,6 +86,10 @@ protected:
 	QPointF getStartPathPt() const { return m_pathStartPt; }
 	QPointF getCurrentPathPt() const { return m_currentPathPt; }
 
-	virtual QRectF getLimitRect() const = 0;
-	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) = 0;
+	virtual QRectF getLimitRect() const { return shape().boundingRect(); };
+
+	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
+	{
+		painter->drawPath(shape());
+	}
 };

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Items/Core/ToolItemBase.hpp"
 
@@ -12,11 +12,9 @@ private:
 
 public:
 	QString getName() const override;
+	QPainterPath shape() const override;
 
 protected:
 	void onPathStart() override;
 	void onPathUpdate() override;
-
-	QRectF getLimitRect() const override;
-	void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
 };

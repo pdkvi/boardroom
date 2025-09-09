@@ -1,4 +1,4 @@
-﻿#include "RectangleItem.hpp"
+#include "RectangleItem.hpp"
 
 #include <QPainter>
 
@@ -7,7 +7,7 @@ QString RectangleItem::getName() const
 	return "Rectangle";
 }
 
-QRectF RectangleItem::getLimitRect() const
+QPainterPath RectangleItem::shape() const
 {
 	auto const [x1, y1] = getStartPathPt();
 	auto const [x2, y2] = getCurrentPathPt();
@@ -15,10 +15,8 @@ QRectF RectangleItem::getLimitRect() const
 	QPointF const topLeft = { std::min(x1, x2), std::min(y1, y2) };
 	QPointF const bottomRight = { std::max(x1, x2), std::max(y1, y2) };
 
-	return QRectF(topLeft, bottomRight);
-}
+	QPainterPath path;
+	path.addRect(QRectF{ topLeft, bottomRight });
 
-void RectangleItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
-{
-	painter->drawRect(getLimitRect());
+	return path;
 }

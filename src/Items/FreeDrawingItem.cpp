@@ -1,11 +1,13 @@
-﻿#include "FreeDrawingItem.hpp"
-
-#include <QGraphicsScene>
-#include <QPainter>
+#include "FreeDrawingItem.hpp"
 
 QString FreeDrawingItem::getName() const
 {
 	return "Free drawing";
+}
+
+QPainterPath FreeDrawingItem::shape() const
+{
+	return m_path;
 }
 
 void FreeDrawingItem::onPathStart()
@@ -16,14 +18,4 @@ void FreeDrawingItem::onPathStart()
 void FreeDrawingItem::onPathUpdate()
 {
 	m_path.lineTo(getCurrentPathPt());
-}
-
-QRectF FreeDrawingItem::getLimitRect() const
-{
-	return m_path.boundingRect();
-}
-
-void FreeDrawingItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
-{
-	painter->drawPath(m_path);
 }
