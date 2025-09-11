@@ -7,10 +7,12 @@ InfiniteScrollGraphicsViewBase::InfiniteScrollGraphicsViewBase(QGraphicsScene* s
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	constexpr qreal minimum = -std::numeric_limits<qreal>::max() / 2;
-	constexpr qreal maximum = std::numeric_limits<qreal>::max();
+	// limit the values from INT_MIN to INT_MAX,
+	// because with large values, the logic of QGraphicsView breaks down.
+	constexpr qreal minimum = INT_MIN;
+	constexpr qreal maximum = INT_MAX;
 
-	setSceneRect(minimum, minimum, maximum, maximum);
+	setSceneRect(minimum, minimum, maximum * 2, maximum * 2);
 }
 
 InfiniteScrollGraphicsViewBase::InfiniteScrollGraphicsViewBase(QWidget* parent)
