@@ -1,72 +1,104 @@
-﻿#include "SceneMinimap.hpp"
+#include "SceneMinimap.hpp"
 
-#include <QGraphicsRectItem>
 #include <QGraphicsView>
-#include <QHBoxLayout>
-
-class SceneMinimapImpl : public QGraphicsView
-{
-	using base_t = QGraphicsView;
-
-public:
-	QGraphicsView const* m_targetView;
-
-public:
-	explicit SceneMinimapImpl(QWidget* parent = nullptr)
-		: base_t(parent), m_targetView(nullptr)
-	{
-		setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	}
-
-public:
-	QGraphicsView const* getTargetView() const { return m_targetView; }
-
-	void setTargetView(QGraphicsView const* targetView)
-	{
-		m_targetView = targetView;
-		setScene(m_targetView->scene());
-	}
-
-protected:
-	void paintEvent(QPaintEvent* event) override
-	{
-		fitInView(sceneRect(), Qt::KeepAspectRatio);
-		base_t::paintEvent(event);
-
-		if (m_targetView == nullptr)
-			return;
-
-		QRectF const screenSceneRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
-
-		QRectF const targetScreenSceneRect = m_targetView->mapToScene(QRect{ 0, 0, m_targetView->width(), m_targetView->height() }).boundingRect();
-		if (targetScreenSceneRect.contains(screenSceneRect))
-			return;
-
-		QPainter painter(viewport());
-
-		painter.setPen(QColor(0, 0, 255, 128));
-		painter.setBrush(QColor(0, 0, 255, 64));
-		painter.drawRect(mapFromScene(targetScreenSceneRect).boundingRect());
-	}
-};
+#include <QMouseEvent>
 
 SceneMinimap::SceneMinimap(QWidget* parent)
-	: base_t(parent), m_impl(new SceneMinimapImpl(this))
+	: base_t(parent), m_targetView(nullptr)
 {
-	auto* layout = new QHBoxLayout;
-	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addWidget(m_impl);
-
-	setLayout(layout);
+	setFrameShape(QFrame::Box);
 }
 
-QGraphicsView const* SceneMinimap::getTargetView() const
+QGraphicsView const* SceneMinimap::getTargetView() const { return m_targetView; }
+void SceneMinimap::setTargetView(QGraphicsView const* targetView) { m_targetView = targetView; }
+
+QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
 {
-	return m_impl->getTargetView();
+	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
+		return QPoint{};
+
+	// FIXME: incorrect algorithm
+
+	QGraphicsScene const* scene = m_targetView->scene();
+	qreal const sceneWidth = scene->sceneRect().width();
+	qreal const sceneHeight = scene->sceneRect().height();
+	qreal const sceneMaxDim = std::max(sceneWidth, sceneHeight);
+
+	qreal const horizSceneOffset = (sceneMaxDim - sceneWidth) / 2 - scene->sceneRect().left();
+	qreal const vertSceneOffset = (sceneMaxDim - sceneHeight) / 2 - scene->sceneRect().top();
+
+	return QPoint(
+		(horizSceneOffset + pt.x()) * width() / sceneMaxDim,
+		(vertSceneOffset + pt.y()) * height() / sceneMaxDim
+	);
 }
 
-void SceneMinimap::setTargetView(QGraphicsView const* targetView)
+QRect SceneMinimap::mapFromScene(QRectF const& rect) const
 {
-	m_impl->setTargetView(targetView);
+	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
+		return QRect{};
+
+	return QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
+}
+
+void SceneMinimap::paintEvent(QPaintEvent* event)
+{
+	// TODO: separate substeps into private methods for early return support
+
+	QPainter painter(this);
+
+	QGraphicsScene* scene = (m_targetView == nullptr ? nullptr : m_targetView->scene());
+
+	// nothing to render, TODO: add base fill color
+	if (scene == nullptr)
+		return;
+
+
+	// drawing aligned area background
+	painter.save();
+	painter.setBrush(Qt::red);
+	painter.drawRect(0, 0, width(), height());
+	painter.restore();
+
+	// drawing target view background
+	painter.save();
+	painter.setBrush(m_targetView->backgroundBrush());
+	painter.drawRect(mapFromScene(scene->sceneRect()));
+	painter.restore();
+
+	// drawing scene
+	scene->render(&painter, mapFromScene(scene->sceneRect()));
+
+
+	// drawing target view rect
+	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->geometry()).boundingRect();
+	if (targetViewRect.contains(scene->sceneRect()))
+	{
+		base_t::paintEvent(event);
+		return;
+	}
+
+	painter.save();
+	painter.setPen(QColor(0, 0, 255, 128));
+	painter.setBrush(QColor(0, 0, 255, 64));
+	painter.drawRect(mapFromScene(targetViewRect));
+	painter.restore();
+
+	base_t::paintEvent(event);
+}
+
+void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
+{
+	// TODO: implement (after paintEvent)
+
+	// QRectF const screenSceneRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
+	//
+	// QRectF const targetScreenSceneRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
+	// if (targetScreenSceneRect.contains(screenSceneRect))
+	// 	return;
+	//
+	// QPointF const newCenterPt = mapToScene(event->pos());
+	// m_targetView->centerOn(newCenterPt);
+
+	base_t::mouseMoveEvent(event);
 }
