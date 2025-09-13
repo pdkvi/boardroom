@@ -17,19 +17,42 @@ QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
 	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
 		return QPoint{};
 
-	// FIXME: incorrect algorithm
-
 	QGraphicsScene const* scene = m_targetView->scene();
 	qreal const sceneWidth = scene->sceneRect().width();
 	qreal const sceneHeight = scene->sceneRect().height();
-	qreal const sceneMaxDim = std::max(sceneWidth, sceneHeight);
 
-	qreal const horizSceneOffset = (sceneMaxDim - sceneWidth) / 2 - scene->sceneRect().left();
-	qreal const vertSceneOffset = (sceneMaxDim - sceneHeight) / 2 - scene->sceneRect().top();
+	qreal const unitsInPx = std::max(sceneWidth / width(), sceneHeight / height());
+
+	// In general, there are two possible scenarios:
+	//     - scene fills the entire horizontal space of the minimap
+	//     - scene fills the entire vertical one.
+	// During this check, both the aspect ratio of the scene and the
+	// aspect ratio of the minimap itself must be taken into account.
+	Qt::Orientation const sceneOrientationInMinimap = (sceneWidth / width() > sceneHeight / height() ?
+		Qt::Horizontal : Qt::Vertical);
+
+	// Calculate the necessary base offset for the point (0, 0) in the coordinates
+	// of the scene so that its projection in the coordinates of the view coincides
+	// with the beginning of the scene that the minimap displays
+	QSizeF const offset = [&]
+	{
+		// Align the beginning of the scene with the coordinates (0, 0)
+		// (because the coordinates of the view start from zero)
+		QSizeF value = { -scene->sceneRect().left(), -scene->sceneRect().top() };
+
+		// For a smaller dimension, it is necessary to calculate the offset,
+		// because in this dimension the scene inside the minimap is aligned.
+		if (sceneOrientationInMinimap == Qt::Horizontal)
+			value.rheight() += (height() * unitsInPx - sceneHeight) / 2;
+		else
+			value.rwidth() += (width() * unitsInPx - sceneWidth) / 2;
+
+		return value;
+	}();
 
 	return QPoint(
-		(horizSceneOffset + pt.x()) * width() / sceneMaxDim,
-		(vertSceneOffset + pt.y()) * height() / sceneMaxDim
+		(offset.width() + pt.x()) / unitsInPx,
+		(offset.height() + pt.y()) / unitsInPx
 	);
 }
 
