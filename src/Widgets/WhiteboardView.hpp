@@ -1,24 +1,24 @@
-﻿#pragma once
+#pragma once
 
-#include <QGraphicsView>
-
-#include "SceneMinimap.hpp"
+#include "Widgets/InfiniteScrollGraphicsViewBase.hpp"
+#include "Widgets/SceneMinimap.hpp"
 
 #include "Items/Core/IToolItem.hpp"
 
 #include "Tools/Core/ITool.hpp"
 
-class WhiteboardView : public QGraphicsView
+class WhiteboardView : public InfiniteScrollGraphicsViewBase
 {
 	Q_OBJECT
 
-	using base_t = QGraphicsView;
+	using base_t = InfiniteScrollGraphicsViewBase;
 	using this_t = WhiteboardView;
 
 	enum class CurrentState
 	{
 		Drawing,
 		Moving,
+		Selection,
 		Nothing
 	};
 
@@ -40,10 +40,9 @@ public:
 	void setCurrentTool(std::unique_ptr<ITool>&& tool);
 	std::unique_ptr<ITool> const& getCurrentTool() const;
 
-	void setDebugRenderingEnabled(bool value);
+	QRectF targetSceneRect() const;
 
-	void syncViewRectWithScene();
-	void syncViewRectWithScreen();
+	void setDebugRenderingEnabled(bool value);
 
 private:
 	void renderDebugInformation(QPainter& painter) const;

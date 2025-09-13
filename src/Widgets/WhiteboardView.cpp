@@ -1,33 +1,30 @@
-﻿#include "WhiteboardView.hpp"
+#include "WhiteboardView.hpp"
 
 #include <QActionGroup>
 #include <QWheelEvent>
 #include <QBoxLayout>
 #include <QMenu>
 
-#include "WhiteboardScene.hpp"
-
 #include "Items/Core/ToolItemBase.hpp"
+
+#include "WhiteboardScene.hpp"
 
 WhiteboardView::WhiteboardView(QWidget* parent)
 	: base_t(parent), m_state(CurrentState::Nothing), m_hasDebugRendering(false)
 {
-	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
 	auto* scene = new WhiteboardScene;
 	setScene(scene);
+
+	setBackgroundBrush(Qt::white);
+
+	scene->addRect(-1, -1, 2, 2, QPen{}, QBrush{Qt::red});
 
 	m_minimap = new SceneMinimap(this);
 	m_minimap->setTargetView(this);
 
-	connect(scene, &QGraphicsScene::sceneRectChanged, this, [this](QRectF const& rect)
-	{
-		m_sceneRect = rect;
-		syncViewRectWithScene();
-
-		update();
-	});
+	double const maxDim = std::clamp(std::max(width(), height()) / 10, 120, 220);
+	m_minimap->setMinimumSize(120, 120);
+	m_minimap->setMaximumSize(maxDim, maxDim);
 }
 
 void WhiteboardView::setCurrentTool(std::unique_ptr<ITool>&& tool)
@@ -40,63 +37,17 @@ std::unique_ptr<ITool> const& WhiteboardView::getCurrentTool() const
 	return m_currentTool;
 }
 
+QRectF WhiteboardView::targetSceneRect() const
+{
+	if (QGraphicsScene const* scene = this->scene())
+		return scene->sceneRect();
+
+	return QRectF{};
+}
+
 void WhiteboardView::setDebugRenderingEnabled(bool value)
 {
 	m_hasDebugRendering = value;
-}
-
-void WhiteboardView::syncViewRectWithScene()
-{
-	QRectF viewBoundingRect = mapFromScene(sceneRect()).boundingRect();
-	QRectF sceneBoundingRect = mapFromScene(m_sceneRect).boundingRect();
-
-	QPointF topLeft =
-	{
-		std::min(viewBoundingRect.left(), sceneBoundingRect.left()),
-		std::min(viewBoundingRect.top(), sceneBoundingRect.top())
-	};
-
-	QPointF bottomRight =
-	{
-		std::max(viewBoundingRect.right(), sceneBoundingRect.right()),
-		std::max(viewBoundingRect.bottom(), sceneBoundingRect.bottom())
-	};
-
-	topLeft = mapToScene(topLeft.toPoint());
-	bottomRight = mapToScene(bottomRight.toPoint());
-
-	QRectF syncRect = { topLeft, bottomRight };
-	setSceneRect(syncRect);
-}
-
-void WhiteboardView::syncViewRectWithScreen()
-{
-	QRectF const viewRect = sceneRect();
-
-	QSize const wndSize = size();
-	QRectF const wndRect =
-	{
-		mapToScene(0.0, 0.0),
-		mapToScene(QPoint(wndSize.width(), wndSize.height()))
-	};
-
-	QPointF topLeft =
-	{
-		std::max(viewRect.left(), m_sceneRect.left()),
-		std::max(viewRect.top(), m_sceneRect.top())
-	};
-	topLeft.setX(std::min(topLeft.x(), wndRect.left()));
-	topLeft.setY(std::min(topLeft.y(), wndRect.top()));
-
-	QPointF bottomRight =
-	{
-		std::min(viewRect.right(), m_sceneRect.right()),
-		std::min(viewRect.bottom(), m_sceneRect.bottom())
-	};
-	bottomRight.setX(std::max(bottomRight.x(), wndRect.right()));
-	bottomRight.setY(std::max(bottomRight.y(), wndRect.bottom()));
-
-	setSceneRect({ topLeft, bottomRight });
 }
 
 void WhiteboardView::renderDebugInformation(QPainter& painter) const
@@ -105,7 +56,7 @@ void WhiteboardView::renderDebugInformation(QPainter& painter) const
 		return;
 
 	painter.setPen(Qt::red);
-	painter.drawPolygon(mapFromScene(m_sceneRect));
+	painter.drawPolygon(mapFromScene(targetSceneRect()));
 
 	painter.setPen(Qt::green);
 	painter.drawPolygon(mapFromScene(sceneRect()));
@@ -148,12 +99,7 @@ void WhiteboardView::paintEvent(QPaintEvent* event)
 
 void WhiteboardView::resizeEvent(QResizeEvent* event)
 {
-	syncViewRectWithScreen();
-
-	double const maxDim = std::clamp(std::max(width(), height()) / 10, 120, 220);
-
-	m_minimap->resize(maxDim, maxDim);
-	m_minimap->move(width() - m_minimap->width(), 0);
+	m_minimap->move(viewport()->width() - m_minimap->width(), 0);
 
 	base_t::resizeEvent(event);
 }
@@ -166,8 +112,6 @@ void WhiteboardView::wheelEvent(QWheelEvent* event)
 
 		double const scaleFactor = (event->angleDelta().y() > 0.0 ? 1.25 : 0.8);
 		scale(scaleFactor, scaleFactor);
-
-		syncViewRectWithScreen();
 	}
 	else
 	{
@@ -184,31 +128,9 @@ void WhiteboardView::wheelEvent(QWheelEvent* event)
 		QRectF const screenRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
 
 		if (event->modifiers().testFlag(Qt::ShiftModifier))
-		{
-			double const leftOffset = -std::max(offset.x(), 0.0);
-			double const rightOffset = -std::min(offset.x(), 0.0);
-
-			if (screenRect.left() + leftOffset < viewRect.left() ||
-				screenRect.right() + rightOffset > viewRect.right())
-			{
-				setSceneRect(viewRect.adjusted(leftOffset, 0.0, rightOffset, 0.0));
-			}
-
 			translate(offset.x(), 0.0);
-		}
 		else
-		{
-			double const topOffset = -std::max(offset.y(), 0.0);
-			double const bottomOffset = -std::min(offset.y(), 0.0);
-
-			if (screenRect.top() + topOffset < viewRect.top() ||
-				screenRect.bottom() + bottomOffset > viewRect.bottom())
-			{
-				setSceneRect(viewRect.adjusted(0.0, topOffset, 0.0, bottomOffset));
-			}
-
 			translate(0.0, offset.y());
-		}
 	}
 }
 
@@ -230,6 +152,14 @@ void WhiteboardView::mousePressEvent(QMouseEvent* event)
 
 	case Qt::RightButton:
 	{
+		if (event->modifiers().testFlag(Qt::ShiftModifier))
+		{
+			m_state = CurrentState::Selection;
+			setDragMode(RubberBandDrag);
+			base_t::mousePressEvent(event);
+			break;
+		}
+
 		m_state = CurrentState::Nothing;
 
 		auto* popup = new QMenu(this);
@@ -268,7 +198,6 @@ void WhiteboardView::mousePressEvent(QMouseEvent* event)
 	}
 
 	m_lastMousePos = event->pos();
-	QGraphicsView::mousePressEvent(event);
 }
 
 void WhiteboardView::mouseReleaseEvent(QMouseEvent* event)
@@ -283,6 +212,12 @@ void WhiteboardView::mouseReleaseEvent(QMouseEvent* event)
 		m_currentItem->endPath(mapToScene(event->pos()));
 		m_currentItem.release();
 
+		break;
+	}
+
+	case Qt::RightButton:
+	{
+		setDragMode(NoDrag);
 		break;
 	}
 
@@ -313,24 +248,6 @@ void WhiteboardView::mouseMoveEvent(QMouseEvent* event)
 		QPointF const mappedLastMousePos = mapToScene(m_lastMousePos);
 
 		QPointF const offset = mappedMousePos - mappedLastMousePos;
-
-		QRectF const viewRect = sceneRect();
-		QRectF const screenRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
-
-		double const leftOffset = -std::max(offset.x(), 0.0);
-		double const rightOffset = -std::min(offset.x(), 0.0);
-
-		double const topOffset = -std::max(offset.y(), 0.0);
-		double const bottomOffset = -std::min(offset.y(), 0.0);
-
-		if (screenRect.left() + leftOffset < viewRect.left() ||
-			screenRect.right() + rightOffset > viewRect.right() ||
-			screenRect.top() + topOffset < viewRect.top() ||
-			screenRect.bottom() + bottomOffset > viewRect.bottom())
-		{
-			setSceneRect(viewRect.adjusted(leftOffset, topOffset, rightOffset, bottomOffset));
-		}
-
 		translate(offset.x(), offset.y());
 
 		m_lastMousePos = mousePos;

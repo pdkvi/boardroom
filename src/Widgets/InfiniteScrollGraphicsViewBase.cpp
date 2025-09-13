@@ -1,6 +1,5 @@
 #include "InfiniteScrollGraphicsViewBase.hpp"
 
-
 InfiniteScrollGraphicsViewBase::InfiniteScrollGraphicsViewBase(QGraphicsScene* scene, QWidget* parent)
 	: base_t(scene, parent)
 {

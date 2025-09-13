@@ -10,7 +10,14 @@ SceneMinimap::SceneMinimap(QWidget* parent)
 }
 
 QGraphicsView const* SceneMinimap::getTargetView() const { return m_targetView; }
-void SceneMinimap::setTargetView(QGraphicsView* targetView) { m_targetView = targetView; }
+void SceneMinimap::setTargetView(QGraphicsView* targetView)
+{
+	m_targetView = targetView;
+	connect(m_targetView->scene(), &QGraphicsScene::changed, [this]()
+	{
+		update();
+	});
+}
 
 QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
 {

@@ -87,7 +87,7 @@
   <customwidget>
    <class>WhiteboardView</class>
    <extends>QGraphicsView</extends>
-   <header>WhiteboardView.hpp</header>
+   <header>Widgets/WhiteboardView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -7,18 +7,20 @@ add_executable(boardroom
 
 	"InfiniteScrollGraphicsViewBase.hpp"
 	"InfiniteScrollGraphicsViewBase.cpp"
+	"Widgets/InfiniteScrollGraphicsViewBase.hpp"
+	"Widgets/InfiniteScrollGraphicsViewBase.cpp"
+
+	"Widgets/WhiteboardView.hpp"
+	"Widgets/WhiteboardView.cpp"
+
+	"Widgets/SceneMinimap.hpp"
+	"Widgets/SceneMinimap.cpp"
 
 	"WhiteboardScene.hpp"
 	"WhiteboardScene.cpp"
 
-	"WhiteboardView.hpp"
-	"WhiteboardView.cpp"
-
 	"WhiteboardToolsModel.hpp"
 	"WhiteboardToolsModel.cpp"
-
-	"SceneMinimap.hpp"
-	"SceneMinimap.cpp"
 
 	"Commands/DrawCommand.hpp"
 	"Commands/DrawCommand.cpp"
