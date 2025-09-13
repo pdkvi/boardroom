@@ -94,7 +94,7 @@ void SceneMinimap::paintEvent(QPaintEvent* event)
 
 
 	// drawing target view rect
-	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->geometry()).boundingRect();
+	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
 	if (targetViewRect.contains(scene->sceneRect()))
 	{
 		base_t::paintEvent(event);
