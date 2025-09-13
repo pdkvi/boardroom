@@ -10,7 +10,7 @@ SceneMinimap::SceneMinimap(QWidget* parent)
 }
 
 QGraphicsView const* SceneMinimap::getTargetView() const { return m_targetView; }
-void SceneMinimap::setTargetView(QGraphicsView const* targetView) { m_targetView = targetView; }
+void SceneMinimap::setTargetView(QGraphicsView* targetView) { m_targetView = targetView; }
 
 QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
 {
@@ -64,6 +64,43 @@ QRect SceneMinimap::mapFromScene(QRectF const& rect) const
 	return QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
 }
 
+QPointF SceneMinimap::mapToScene(QPoint const& pt)
+{
+	// All formulas (except the endpoint) are similar to
+	// those in SceneMinimap::mapFromScene()
+	// TODO: separate common parts into own methods
+
+	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
+		return QPoint{};
+
+	QGraphicsScene const* scene = m_targetView->scene();
+	qreal const sceneWidth = scene->sceneRect().width();
+	qreal const sceneHeight = scene->sceneRect().height();
+
+	qreal const unitsInPx = std::max(sceneWidth / width(), sceneHeight / height());
+
+	Qt::Orientation const sceneOrientationInMinimap = (sceneWidth / width() > sceneHeight / height() ?
+		Qt::Horizontal : Qt::Vertical);
+
+
+	QSizeF const offset = [&]
+	{
+		QSizeF value = { -scene->sceneRect().left(), -scene->sceneRect().top() };
+
+		if (sceneOrientationInMinimap == Qt::Horizontal)
+			value.rheight() += (height() * unitsInPx - sceneHeight) / 2;
+		else
+			value.rwidth() += (width() * unitsInPx - sceneWidth) / 2;
+
+		return value;
+	}();
+
+	return QPoint(
+		pt.x() * unitsInPx - offset.width(),
+		pt.y() * unitsInPx - offset.height()
+	);
+}
+
 void SceneMinimap::paintEvent(QPaintEvent* event)
 {
 	// TODO: separate substeps into private methods for early return support
@@ -112,16 +149,13 @@ void SceneMinimap::paintEvent(QPaintEvent* event)
 
 void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
 {
-	// TODO: implement (after paintEvent)
+	QGraphicsScene* scene = (m_targetView == nullptr ? nullptr : m_targetView->scene());
+	if (scene == nullptr)
+		return;
 
-	// QRectF const screenSceneRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
-	//
-	// QRectF const targetScreenSceneRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
-	// if (targetScreenSceneRect.contains(screenSceneRect))
-	// 	return;
-	//
-	// QPointF const newCenterPt = mapToScene(event->pos());
-	// m_targetView->centerOn(newCenterPt);
+	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
+	if (targetViewRect.contains(scene->sceneRect()))
+		return;
 
-	base_t::mouseMoveEvent(event);
+	m_targetView->centerOn(mapToScene(event->pos()));
 }
