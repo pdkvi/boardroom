@@ -17,7 +17,11 @@ bool SceneMinimap::eventFilter(QObject* watched, QEvent* event)
 	return base_t::eventFilter(watched, event);
 }
 
-QGraphicsView const* SceneMinimap::getTargetView() const { return m_targetView; }
+QGraphicsScene* SceneMinimap::getTargetScene() const
+{ return (m_targetView == nullptr ? nullptr : m_targetView->scene()); }
+
+QGraphicsView* SceneMinimap::getTargetView() const
+{ return m_targetView; }
 
 void SceneMinimap::setTargetView(QGraphicsView* targetView)
 {
@@ -32,10 +36,10 @@ void SceneMinimap::setTargetView(QGraphicsView* targetView)
 
 QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
 {
-	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
+	QGraphicsScene const* scene = getTargetScene();
+	if (scene == nullptr)
 		return QPoint{};
 
-	QGraphicsScene const* scene = m_targetView->scene();
 	qreal const sceneWidth = scene->sceneRect().width();
 	qreal const sceneHeight = scene->sceneRect().height();
 
@@ -76,10 +80,9 @@ QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
 
 QRect SceneMinimap::mapFromScene(QRectF const& rect) const
 {
-	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
-		return QRect{};
-
-	return QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight()));
+	QPoint const topLeft = mapFromScene(rect.topLeft());
+	QPoint const bottomRight = mapFromScene(rect.bottomRight());
+	return QRect(topLeft, bottomRight);
 }
 
 QPointF SceneMinimap::mapToScene(QPoint const& pt)
@@ -121,16 +124,32 @@ QPointF SceneMinimap::mapToScene(QPoint const& pt)
 
 void SceneMinimap::paintEvent(QPaintEvent* event)
 {
-	// TODO: separate substeps into private methods for early return support
-
 	QPainter painter(this);
 
-	QGraphicsScene* scene = (m_targetView == nullptr ? nullptr : m_targetView->scene());
+	paintTargetView(painter);
+	paintTargetViewRect(painter);
 
-	// nothing to render, TODO: add base fill color
+	base_t::paintEvent(event);
+}
+
+void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
+{
+	QGraphicsScene const* scene = getTargetScene();
 	if (scene == nullptr)
 		return;
 
+	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
+	if (targetViewRect.contains(scene->sceneRect()))
+		return;
+
+	m_targetView->centerOn(mapToScene(event->pos()));
+}
+
+void SceneMinimap::paintTargetView(QPainter& painter)
+{
+	QGraphicsScene* scene = getTargetScene();
+	if (scene == nullptr)
+		return;
 
 	// drawing aligned area background
 	painter.save();
@@ -145,29 +164,14 @@ void SceneMinimap::paintEvent(QPaintEvent* event)
 	painter.restore();
 
 	// drawing scene
-	scene->render(&painter, mapFromScene(scene->sceneRect()));
-
-
-	// drawing target view rect
-	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
-	if (targetViewRect.contains(scene->sceneRect()))
-	{
-		base_t::paintEvent(event);
-		return;
-	}
-
 	painter.save();
-	painter.setPen(QColor(0, 0, 255, 128));
-	painter.setBrush(QColor(0, 0, 255, 64));
-	painter.drawRect(mapFromScene(targetViewRect));
+	scene->render(&painter, mapFromScene(scene->sceneRect()));
 	painter.restore();
-
-	base_t::paintEvent(event);
 }
 
-void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
+void SceneMinimap::paintTargetViewRect(QPainter& painter)
 {
-	QGraphicsScene* scene = (m_targetView == nullptr ? nullptr : m_targetView->scene());
+	QGraphicsScene const* scene = getTargetScene();
 	if (scene == nullptr)
 		return;
 
@@ -175,5 +179,9 @@ void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
 	if (targetViewRect.contains(scene->sceneRect()))
 		return;
 
-	m_targetView->centerOn(mapToScene(event->pos()));
+	painter.save();
+	painter.setPen(QColor(0, 0, 255, 128));
+	painter.setBrush(QColor(0, 0, 255, 64));
+	painter.drawRect(mapFromScene(targetViewRect));
+	painter.restore();
 }

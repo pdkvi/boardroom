@@ -2,6 +2,7 @@
 
 #include <QFrame>
 
+class QGraphicsScene;
 class QGraphicsView;
 
 class SceneMinimap : public QFrame
@@ -18,7 +19,9 @@ public:
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
-	QGraphicsView const* getTargetView() const;
+	QGraphicsScene* getTargetScene() const;
+
+	QGraphicsView* getTargetView() const;
 	void setTargetView(QGraphicsView* targetView);
 
 	QPoint mapFromScene(QPointF const& pt) const;
@@ -28,4 +31,8 @@ public:
 protected:
 	void paintEvent(QPaintEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
+
+private:
+	void paintTargetView(QPainter& painter);
+	void paintTargetViewRect(QPainter& painter);
 };
