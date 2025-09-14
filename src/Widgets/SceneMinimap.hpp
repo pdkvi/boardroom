@@ -11,9 +11,17 @@ class SceneMinimap : public QFrame
 
 	using base_t = QFrame;
 
+public:
+	enum class InteractionState
+	{
+		DoNothing,
+		MovingViewport
+	};
+
 private:
 	QGraphicsView* m_targetView;
 	QColor m_viewRectColor;
+	InteractionState m_interactionState;
 
 public:
 	explicit SceneMinimap(QWidget* parent = nullptr);
@@ -27,6 +35,8 @@ public:
 
 	bool isTargetSceneFitInTargetView() const;
 
+	InteractionState getInteractionState() const;
+
 	std::optional<QPoint> mapFromScene(QPointF const& pt) const;
 	std::optional<QRect> mapFromScene(QRectF const& rect) const;
 	std::optional<QPointF> mapToScene(QPoint const& pt);
@@ -34,6 +44,7 @@ public:
 protected:
 	void paintEvent(QPaintEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
 	void paintTargetView(QPainter& painter);

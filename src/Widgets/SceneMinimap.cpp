@@ -4,7 +4,8 @@
 #include <QMouseEvent>
 
 SceneMinimap::SceneMinimap(QWidget* parent)
-	: base_t(parent), m_targetView(nullptr), m_viewRectColor(Qt::blue)
+	: base_t(parent), m_targetView(nullptr), m_viewRectColor(Qt::blue),
+	  m_interactionState(InteractionState::DoNothing)
 {
 	setFrameShape(QFrame::Box);
 }
@@ -43,6 +44,9 @@ bool SceneMinimap::isTargetSceneFitInTargetView() const
 	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
 	return targetViewRect.contains(scene->sceneRect());
 }
+
+SceneMinimap::InteractionState SceneMinimap::getInteractionState() const
+{ return m_interactionState; }
 
 std::optional<QPoint> SceneMinimap::mapFromScene(QPointF const& pt) const
 {
@@ -95,14 +99,19 @@ void SceneMinimap::paintEvent(QPaintEvent* event)
 
 void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
 {
-	if (isTargetSceneFitInTargetView())
-		return;
+	m_interactionState = InteractionState::MovingViewport;
 
 	mapToScene(event->pos()).and_then([this](QPointF const& centerPt)
 	{
 		m_targetView->centerOn(centerPt);
 		return std::make_optional(centerPt);
 	});
+}
+
+void SceneMinimap::mouseReleaseEvent(QMouseEvent* event)
+{
+	m_interactionState = InteractionState::DoNothing;
+	base_t::mouseReleaseEvent(event);
 }
 
 void SceneMinimap::paintTargetView(QPainter& painter)
