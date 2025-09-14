@@ -91,7 +91,8 @@ void WhiteboardView::renderDebugInformation(QPainter& painter) const
 
 void WhiteboardView::paintEvent(QPaintEvent* event)
 {
-	m_minimap->setVisible(!m_minimap->isTargetSceneFitInTargetView());
+	m_minimap->setVisible(m_state == CurrentState::Moving ||
+		!m_minimap->isTargetSceneFitInTargetView());
 
 	base_t::paintEvent(event);
 
