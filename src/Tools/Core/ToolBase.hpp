@@ -1,58 +1,56 @@
-﻿#pragma once
+#pragma once
 
 #include <unordered_set>
+#include <memory>
 
-#include "Tools/Core/ITool.hpp"
+#include <QIcon>
 
 #include "Items/Core/ToolItemBase.hpp"
 
 #include "Utility/IdHolder.hpp"
 #include "Utility/Registry.hpp"
 
-using ToolRegistry = Registry<ITool>;
-
-template <typename TTool>
-class ToolBase : public ITool
+class ToolBase : public SelectedConstruction
 {
-	using id_holder_t = IdHolder<ITool, TTool>;
+	friend Registry;
 
-protected:
-	static inline std::unordered_set<id_t> s_supportedItemsId;
+	using this_t = ToolBase;
+
+public:
+	using id_t = size_t;
 
 private:
 	id_t m_currentItemId = id_t{};
 
 public:
-	static id_t getToolId()
+	~ToolBase() override = default;
+	virtual std::unique_ptr<ToolBase> clone() const = 0;
+
+	virtual id_t getId() const = 0;
+	virtual QString getName() const = 0;
+	virtual QIcon getIcon() const = 0;
+
+	virtual std::unordered_set<ToolItemBase::id_t> const& getSupportedItemsId() const = 0;
+
+	ToolItemBase::id_t getCurrentItemId() const;
+	void setCurrentItemId(ToolItemBase::id_t id);
+
+	std::unique_ptr<ToolItemBase> createItem();
+
+protected:
+	template <typename TDerived> requires std::derived_from<TDerived, this_t>
+	static id_t getIdFromHolder()
 	{
-		auto const& holder = id_holder_t::getInstance();
+		auto const& holder = IdHolder<this_t, TDerived>::getInstance();
 		return holder.getId();
 	}
 
-	id_t getId() const override { return getToolId(); }
-
-	std::unique_ptr<ITool> clone() const override { return std::make_unique<TTool>(); }
-
-	std::unordered_set<id_t> const& getAvailableItemsId() override
+	template <typename TDerived> requires std::derived_from<TDerived, this_t>
+	static std::unordered_set<ToolItemBase::id_t>& getSupportedItemsIdFromHolder()
 	{
-		return s_supportedItemsId;
-	}
-
-	id_t getCurrentItemId() const override
-	{
-		return m_currentItemId;
-	}
-
-	void setCurrentItemId(id_t id) override
-	{
-		if (s_supportedItemsId.contains(id) == false)
-			return;
-
-		m_currentItemId = id;
-	}
-
-	std::unique_ptr<IToolItem> createItem() override
-	{
-		return ToolItemRegistry::getItem(getCurrentItemId())->clone();
+		static std::unordered_set<ToolItemBase::id_t> supportedIds;
+		return supportedIds;
 	}
 };
+
+using ToolRegistry = Registry<ToolBase>;

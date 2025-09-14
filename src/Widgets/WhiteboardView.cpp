@@ -5,8 +5,6 @@
 #include <QBoxLayout>
 #include <QMenu>
 
-#include "Items/Core/ToolItemBase.hpp"
-
 #include "WhiteboardScene.hpp"
 
 WhiteboardView::WhiteboardView(QWidget* parent)
@@ -27,15 +25,11 @@ WhiteboardView::WhiteboardView(QWidget* parent)
 	m_minimap->setMaximumSize(maxDim, maxDim);
 }
 
-void WhiteboardView::setCurrentTool(std::unique_ptr<ITool>&& tool)
-{
-	m_currentTool = std::move(tool);
-}
+void WhiteboardView::setCurrentTool(std::unique_ptr<ToolBase>&& tool)
+{ m_currentTool = std::move(tool); }
 
-std::unique_ptr<ITool> const& WhiteboardView::getCurrentTool() const
-{
-	return m_currentTool;
-}
+std::unique_ptr<ToolBase> const& WhiteboardView::getCurrentTool() const
+{ return m_currentTool; }
 
 QRectF WhiteboardView::targetSceneRect() const
 {
@@ -46,9 +40,7 @@ QRectF WhiteboardView::targetSceneRect() const
 }
 
 void WhiteboardView::setDebugRenderingEnabled(bool value)
-{
-	m_hasDebugRendering = value;
-}
+{ m_hasDebugRendering = value; }
 
 void WhiteboardView::renderDebugInformation(QPainter& painter) const
 {
@@ -128,9 +120,6 @@ void WhiteboardView::wheelEvent(QWheelEvent* event)
 		offset *= (event->angleDelta().y() > 0.0 ? 0.1 : -0.1);
 		offset = mapToScene(wndSceneCenter + offset.toPoint());
 
-		QRectF const viewRect = sceneRect();
-		QRectF const screenRect = mapToScene(QRect{ 0, 0, width(), height() }).boundingRect();
-
 		if (event->modifiers().testFlag(Qt::ShiftModifier))
 			translate(offset.x(), 0.0);
 		else
@@ -169,9 +158,9 @@ void WhiteboardView::mousePressEvent(QMouseEvent* event)
 		auto* popup = new QMenu(this);
 		popup->setAttribute(Qt::WA_DeleteOnClose);
 
-		for (IToolItem::id_t id : m_currentTool->getAvailableItemsId())
+		for (ToolItemBase::id_t id : m_currentTool->getSupportedItemsId())
 		{
-			std::shared_ptr<IToolItem const> item = ToolItemRegistry::getItem(id);
+			std::shared_ptr<ToolItemBase const> item = ToolItemRegistry::getItem(id);
 
 			auto* action = new QAction(item->getName());
 			action->setCheckable(true);

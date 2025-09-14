@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <QAbstractListModel>
 
@@ -13,10 +13,15 @@ public:
 	};
 
 private:
-	std::vector<std::shared_ptr<ITool const>> m_toolsId;
+	std::vector<std::shared_ptr<ToolBase const>> m_toolsId;
 
 public:
-	void addTool(ITool::id_t id);
+	template <typename TTool>
+	void addTool()
+	{
+		ToolBase::id_t const toolId = ToolRegistry::getItemId<TTool>();
+		m_toolsId.push_back(ToolRegistry::getItem(toolId));
+	}
 
 	int rowCount(QModelIndex const& parent) const override;
 

@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget* parent)
 	});
 
 	auto* toolsModel = new WhiteboardToolsModel;
-	toolsModel->addTool(PenTool::getToolId());
-	toolsModel->addTool(ShapeTool::getToolId());
+	toolsModel->addTool<PenTool>();
+	toolsModel->addTool<ShapeTool>();
 
 	m_ui->toolsView->setModel(toolsModel);
 
@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget* parent)
 			QAbstractItemModel const* model = m_ui->toolsView->model();
 
 			QVariant const data = model->data(current, WhiteboardToolsModel::ItemRole::Data);
-			auto const tool = data.value<std::shared_ptr<ITool const>>();
+			auto const tool = data.value<std::shared_ptr<ToolBase const>>();
 
 			m_ui->whiteboardView->setCurrentTool(tool->clone());
 		}
