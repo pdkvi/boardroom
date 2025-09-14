@@ -34,91 +34,42 @@ void SceneMinimap::setTargetView(QGraphicsView* targetView)
 	update();
 }
 
-QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
+std::optional<QPoint> SceneMinimap::mapFromScene(QPointF const& pt) const
 {
-	QGraphicsScene const* scene = getTargetScene();
-	if (scene == nullptr)
-		return QPoint{};
+	std::optional<QPointF> const alignedSceneTopLeft = getAlignedSceneTopLeftPt();
+	std::optional<qreal> unitsInPx = getSceneUnitsInPx();
 
-	qreal const sceneWidth = scene->sceneRect().width();
-	qreal const sceneHeight = scene->sceneRect().height();
-
-	qreal const unitsInPx = std::max(sceneWidth / width(), sceneHeight / height());
-
-	// In general, there are two possible scenarios:
-	//     - scene fills the entire horizontal space of the minimap
-	//     - scene fills the entire vertical one.
-	// During this check, both the aspect ratio of the scene and the
-	// aspect ratio of the minimap itself must be taken into account.
-	Qt::Orientation const sceneOrientationInMinimap = (sceneWidth / width() > sceneHeight / height() ?
-		Qt::Horizontal : Qt::Vertical);
-
-	// Calculate the necessary base offset for the point (0, 0) in the coordinates
-	// of the scene so that its projection in the coordinates of the view coincides
-	// with the beginning of the scene that the minimap displays
-	QSizeF const offset = [&]
-	{
-		// Align the beginning of the scene with the coordinates (0, 0)
-		// (because the coordinates of the view start from zero)
-		QSizeF value = { -scene->sceneRect().left(), -scene->sceneRect().top() };
-
-		// For a smaller dimension, it is necessary to calculate the offset,
-		// because in this dimension the scene inside the minimap is aligned.
-		if (sceneOrientationInMinimap == Qt::Horizontal)
-			value.rheight() += (height() * unitsInPx - sceneHeight) / 2;
-		else
-			value.rwidth() += (width() * unitsInPx - sceneWidth) / 2;
-
-		return value;
-	}();
+	if (alignedSceneTopLeft == std::nullopt || unitsInPx == std::nullopt)
+		return std::nullopt;
 
 	return QPoint(
-		(offset.width() + pt.x()) / unitsInPx,
-		(offset.height() + pt.y()) / unitsInPx
+		(alignedSceneTopLeft->x() + pt.x()) / (*unitsInPx),
+		(alignedSceneTopLeft->y() + pt.y()) / (*unitsInPx)
 	);
 }
 
-QRect SceneMinimap::mapFromScene(QRectF const& rect) const
+std::optional<QRect> SceneMinimap::mapFromScene(QRectF const& rect) const
 {
-	QPoint const topLeft = mapFromScene(rect.topLeft());
-	QPoint const bottomRight = mapFromScene(rect.bottomRight());
-	return QRect(topLeft, bottomRight);
+	std::optional<QPoint> const topLeft = mapFromScene(rect.topLeft());
+	std::optional<QPoint> const bottomRight = mapFromScene(rect.bottomRight());
+
+	if (topLeft == std::nullopt || bottomRight == std::nullopt)
+		return std::nullopt;
+
+	return QRect(*topLeft, *bottomRight);
 }
 
-QPointF SceneMinimap::mapToScene(QPoint const& pt)
+std::optional<QPointF> SceneMinimap::mapToScene(QPoint const& pt)
 {
-	// All formulas (except the endpoint) are similar to
-	// those in SceneMinimap::mapFromScene()
-	// TODO: separate common parts into own methods
+	std::optional<QPointF> const alignedSceneTopLeft = getAlignedSceneTopLeftPt();
+	std::optional<qreal> const unitsInPx = getSceneUnitsInPx();
 
-	if (m_targetView == nullptr || m_targetView->scene() == nullptr)
-		return QPoint{};
-
-	QGraphicsScene const* scene = m_targetView->scene();
-	qreal const sceneWidth = scene->sceneRect().width();
-	qreal const sceneHeight = scene->sceneRect().height();
-
-	qreal const unitsInPx = std::max(sceneWidth / width(), sceneHeight / height());
-
-	Qt::Orientation const sceneOrientationInMinimap = (sceneWidth / width() > sceneHeight / height() ?
-		Qt::Horizontal : Qt::Vertical);
-
-
-	QSizeF const offset = [&]
-	{
-		QSizeF value = { -scene->sceneRect().left(), -scene->sceneRect().top() };
-
-		if (sceneOrientationInMinimap == Qt::Horizontal)
-			value.rheight() += (height() * unitsInPx - sceneHeight) / 2;
-		else
-			value.rwidth() += (width() * unitsInPx - sceneWidth) / 2;
-
-		return value;
-	}();
+	if (alignedSceneTopLeft == std::nullopt || unitsInPx == std::nullopt)
+		return std::nullopt;
 
 	return QPoint(
-		pt.x() * unitsInPx - offset.width(),
-		pt.y() * unitsInPx - offset.height()
+		pt.x() * (*unitsInPx) - alignedSceneTopLeft->x(),
+		pt.y() * (*unitsInPx) - alignedSceneTopLeft->y()
 	);
 }
 
@@ -142,7 +93,11 @@ void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
 	if (targetViewRect.contains(scene->sceneRect()))
 		return;
 
-	m_targetView->centerOn(mapToScene(event->pos()));
+	mapToScene(event->pos()).and_then([this](QPointF const& centerPt)
+	{
+		m_targetView->centerOn(centerPt);
+		return std::make_optional(centerPt);
+	});
 }
 
 void SceneMinimap::paintTargetView(QPainter& painter)
@@ -168,13 +123,25 @@ void SceneMinimap::paintTargetView(QPainter& painter)
 
 	// drawing target view background
 	painter.save();
+
 	painter.setBrush(m_targetView->backgroundBrush());
-	painter.drawRect(mapFromScene(scene->sceneRect()));
+	mapFromScene(scene->sceneRect()).and_then([scene, &painter](QRect const& rect)
+	{
+		painter.drawRect(rect);
+		return std::make_optional(rect);
+	});
+
 	painter.restore();
 
 	// drawing scene
 	painter.save();
-	scene->render(&painter, mapFromScene(scene->sceneRect()));
+
+	mapFromScene(scene->sceneRect()).and_then([scene, &painter](QRect const& rect)
+	{
+		scene->render(&painter, rect);
+		return std::make_optional(rect);
+	});
+
 	painter.restore();
 }
 
@@ -198,6 +165,76 @@ void SceneMinimap::paintTargetViewRect(QPainter& painter)
 	brushColor.setAlpha(64);
 	painter.setBrush(brushColor);
 
-	painter.drawRect(mapFromScene(targetViewRect));
+	mapFromScene(targetViewRect).and_then([&painter](QRect const& rect)
+	{
+		painter.drawRect(rect);
+		return std::make_optional(rect);
+	});
+
 	painter.restore();
+}
+
+std::optional<qreal> SceneMinimap::getSceneUnitsInPx() const
+{
+	QGraphicsScene const* scene = getTargetScene();
+	if (scene == nullptr)
+		return std::nullopt;
+
+	qreal const sceneWidth = scene->sceneRect().width();
+	qreal const sceneHeight = scene->sceneRect().height();
+
+	qreal const horizUnitsInPx = sceneWidth / width();
+	qreal const vertUnitsInPx = sceneHeight / height();
+
+	return std::max(horizUnitsInPx, vertUnitsInPx);
+}
+
+std::optional<Qt::Orientation> SceneMinimap::getSceneOrientationInMinimap() const
+{
+	QGraphicsScene const* scene = getTargetScene();
+	if (scene == nullptr)
+		return std::nullopt;
+
+	qreal const sceneWidth = scene->sceneRect().width();
+	qreal const sceneHeight = scene->sceneRect().height();
+
+	qreal const horizUnitsInPx = sceneWidth / width();
+	qreal const vertUnitsInPx = sceneHeight / height();
+
+	return horizUnitsInPx > vertUnitsInPx ? Qt::Horizontal : Qt::Vertical;
+}
+
+std::optional<QPointF> SceneMinimap::getAlignedSceneTopLeftPt() const
+{
+	QGraphicsScene const* scene = getTargetScene();
+	if (scene == nullptr)
+		return std::nullopt;
+
+	qreal const sceneWidth = scene->sceneRect().width();
+	qreal const sceneHeight = scene->sceneRect().height();
+
+	// Align the beginning of the scene with the coordinates (0, 0)
+	// (because the coordinates of the view start from zero)
+	QPointF value = { -scene->sceneRect().left(), -scene->sceneRect().top() };
+
+	qreal const unitsInPx = *getSceneUnitsInPx().or_else([]()
+	{
+		Q_ASSERT(false);
+		return std::make_optional<qreal>();
+	});
+
+	// For a smaller dimension, it is necessary to calculate the offset,
+	// because in this dimension the scene inside the minimap is aligned.
+	Qt::Orientation orientation = *getSceneOrientationInMinimap().or_else([]
+	{
+		Q_ASSERT(false);
+		return std::make_optional<Qt::Orientation>();
+	});
+
+	if (orientation == Qt::Horizontal)
+		value.ry() += (height() * unitsInPx - sceneHeight) / 2;
+	else
+		value.rx() += (width() * unitsInPx - sceneWidth) / 2;
+
+	return value;
 }
