@@ -16,6 +16,8 @@ private:
 public:
 	explicit SceneMinimap(QWidget* parent = nullptr);
 
+	bool eventFilter(QObject* watched, QEvent* event) override;
+
 	QGraphicsView const* getTargetView() const;
 	void setTargetView(QGraphicsView* targetView);
 

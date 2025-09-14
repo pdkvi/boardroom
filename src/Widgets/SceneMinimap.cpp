@@ -9,14 +9,25 @@ SceneMinimap::SceneMinimap(QWidget* parent)
 	setFrameShape(QFrame::Box);
 }
 
+bool SceneMinimap::eventFilter(QObject* watched, QEvent* event)
+{
+	if (event->type() == QEvent::Paint && watched == m_targetView->viewport())
+		update();
+
+	return base_t::eventFilter(watched, event);
+}
+
 QGraphicsView const* SceneMinimap::getTargetView() const { return m_targetView; }
+
 void SceneMinimap::setTargetView(QGraphicsView* targetView)
 {
+	if (m_targetView)
+		m_targetView->viewport()->removeEventFilter(this);
+
 	m_targetView = targetView;
-	connect(m_targetView->scene(), &QGraphicsScene::changed, [this]()
-	{
-		update();
-	});
+	m_targetView->viewport()->installEventFilter(this);
+
+	update();
 }
 
 QPoint SceneMinimap::mapFromScene(QPointF const& pt) const
