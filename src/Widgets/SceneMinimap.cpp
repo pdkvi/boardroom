@@ -153,7 +153,16 @@ void SceneMinimap::paintTargetView(QPainter& painter)
 
 	// drawing aligned area background
 	painter.save();
-	painter.setBrush(Qt::red);
+
+	QBrush alignBrush = m_targetView->backgroundBrush();
+
+	float h, s, v;
+	alignBrush.color().getHsvF(&h, &s, &v);
+	v += (v > 0.5f ? -0.1f : 0.1f);
+
+	alignBrush.setColor(QColor::fromHsvF(h, s, v));
+	painter.setBrush(alignBrush);
+
 	painter.drawRect(0, 0, width(), height());
 	painter.restore();
 
