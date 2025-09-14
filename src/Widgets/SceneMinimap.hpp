@@ -25,6 +25,8 @@ public:
 	QGraphicsView* getTargetView() const;
 	void setTargetView(QGraphicsView* targetView);
 
+	bool isTargetSceneFitInTargetView() const;
+
 	std::optional<QPoint> mapFromScene(QPointF const& pt) const;
 	std::optional<QRect> mapFromScene(QRectF const& rect) const;
 	std::optional<QPointF> mapToScene(QPoint const& pt);

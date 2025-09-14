@@ -91,6 +91,8 @@ void WhiteboardView::renderDebugInformation(QPainter& painter) const
 
 void WhiteboardView::paintEvent(QPaintEvent* event)
 {
+	m_minimap->setVisible(!m_minimap->isTargetSceneFitInTargetView());
+
 	base_t::paintEvent(event);
 
 	QPainter painter(viewport());
@@ -99,8 +101,7 @@ void WhiteboardView::paintEvent(QPaintEvent* event)
 
 void WhiteboardView::resizeEvent(QResizeEvent* event)
 {
-	m_minimap->move(viewport()->width() - m_minimap->width(), 0);
-
+	m_minimap->move(width() - m_minimap->width(), 0);
 	base_t::resizeEvent(event);
 }
 

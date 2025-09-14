@@ -34,6 +34,16 @@ void SceneMinimap::setTargetView(QGraphicsView* targetView)
 	update();
 }
 
+bool SceneMinimap::isTargetSceneFitInTargetView() const
+{
+	QGraphicsScene const* scene = getTargetScene();
+	if (scene == nullptr)
+		return false;
+
+	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
+	return targetViewRect.contains(scene->sceneRect());
+}
+
 std::optional<QPoint> SceneMinimap::mapFromScene(QPointF const& pt) const
 {
 	std::optional<QPointF> const alignedSceneTopLeft = getAlignedSceneTopLeftPt();
@@ -85,12 +95,7 @@ void SceneMinimap::paintEvent(QPaintEvent* event)
 
 void SceneMinimap::mouseMoveEvent(QMouseEvent* event)
 {
-	QGraphicsScene const* scene = getTargetScene();
-	if (scene == nullptr)
-		return;
-
-	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
-	if (targetViewRect.contains(scene->sceneRect()))
+	if (isTargetSceneFitInTargetView())
 		return;
 
 	mapToScene(event->pos()).and_then([this](QPointF const& centerPt)
@@ -151,8 +156,7 @@ void SceneMinimap::paintTargetViewRect(QPainter& painter)
 	if (scene == nullptr)
 		return;
 
-	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
-	if (targetViewRect.contains(scene->sceneRect()))
+	if (isTargetSceneFitInTargetView())
 		return;
 
 	painter.save();
@@ -165,6 +169,7 @@ void SceneMinimap::paintTargetViewRect(QPainter& painter)
 	brushColor.setAlpha(64);
 	painter.setBrush(brushColor);
 
+	QRectF const targetViewRect = m_targetView->mapToScene(m_targetView->viewport()->geometry()).boundingRect();
 	mapFromScene(targetViewRect).and_then([&painter](QRect const& rect)
 	{
 		painter.drawRect(rect);
