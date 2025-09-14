@@ -53,6 +53,7 @@
       <string>WhiteboardView</string>
      </property>
      <addaction name="whiteboardViewDebugRenderingAction"/>
+     <addaction name="whiteboardViewSpawnExternalMiminapAction"/>
     </widget>
     <addaction name="whiteboardViewDebugMenu"/>
    </widget>
@@ -81,13 +82,18 @@
     <string>Debug rendering</string>
    </property>
   </action>
+  <action name="whiteboardViewSpawnExternalMiminapAction">
+   <property name="text">
+    <string>Spawn external minimap</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>WhiteboardView</class>
    <extends>QGraphicsView</extends>
-   <header>WhiteboardView.hpp</header>
+   <header>Widgets/WhiteboardView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

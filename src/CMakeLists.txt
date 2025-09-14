@@ -1,15 +1,24 @@
-﻿add_executable(boardroom
+add_executable(boardroom
 	"main.cpp"
 
 	"MainWindow.hpp"
 	"MainWindow.cpp"
 	"MainWindow.ui"
 
+	"Widgets/SceneViewBase.hpp"
+	"Widgets/SceneViewBase.cpp"
+
+	"Widgets/InfiniteScrollGraphicsViewBase.hpp"
+	"Widgets/InfiniteScrollGraphicsViewBase.cpp"
+
+	"Widgets/WhiteboardView.hpp"
+	"Widgets/WhiteboardView.cpp"
+
+	"Widgets/SceneMinimap.hpp"
+	"Widgets/SceneMinimap.cpp"
+
 	"WhiteboardScene.hpp"
 	"WhiteboardScene.cpp"
-
-	"WhiteboardView.hpp"
-	"WhiteboardView.cpp"
 
 	"WhiteboardToolsModel.hpp"
 	"WhiteboardToolsModel.cpp"
