@@ -3,9 +3,9 @@
 #include "Widgets/InfiniteScrollGraphicsViewBase.hpp"
 #include "Widgets/SceneMinimap.hpp"
 
-#include "Items/Core/IToolItem.hpp"
+#include "Tools/Core/ToolBase.hpp"
 
-#include "Tools/Core/ITool.hpp"
+#include "Items/Core/ToolItemBase.hpp"
 
 class WhiteboardView : public InfiniteScrollGraphicsViewBase
 {
@@ -29,16 +29,16 @@ private:
 	CurrentState m_state;
 	bool m_hasDebugRendering;
 
-	std::unique_ptr<ITool> m_currentTool;
-	std::unique_ptr<IToolItem> m_currentItem;
+	std::unique_ptr<ToolBase> m_currentTool;
+	std::unique_ptr<ToolItemBase> m_currentItem;
 
 	SceneMinimap* m_minimap;
 
 public:
 	explicit WhiteboardView(QWidget* parent = nullptr);
 
-	void setCurrentTool(std::unique_ptr<ITool>&& tool);
-	std::unique_ptr<ITool> const& getCurrentTool() const;
+	void setCurrentTool(std::unique_ptr<ToolBase>&& tool);
+	std::unique_ptr<ToolBase> const& getCurrentTool() const;
 
 	QRectF targetSceneRect() const;
 

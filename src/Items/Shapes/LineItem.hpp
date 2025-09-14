@@ -1,10 +1,15 @@
-﻿#pragma once
+#pragma once
 
 #include "Items/Core/ToolItemBase.hpp"
 
-class LineItem : public ToolItemBase<LineItem>
+class LineItem : public ToolItemBase
 {
+	using this_t = LineItem;
+
 public:
+	std::unique_ptr<ToolItemBase> clone() const override;
+
+	id_t getId() const override;
 	QString getName() const override;
 
 protected:

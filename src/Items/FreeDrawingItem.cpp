@@ -1,29 +1,25 @@
-﻿#include "FreeDrawingItem.hpp"
+#include "FreeDrawingItem.hpp"
 
 #include <QGraphicsScene>
 #include <QPainter>
 
+std::unique_ptr<ToolItemBase> FreeDrawingItem::clone() const
+{ return std::make_unique<this_t>(); }
+
+ToolItemBase::id_t FreeDrawingItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString FreeDrawingItem::getName() const
-{
-	return "Free drawing";
-}
+{ return "Free drawing"; }
 
 void FreeDrawingItem::onPathStart()
-{
-	m_path.moveTo(getStartPathPt());
-}
+{ m_path.moveTo(getStartPathPt()); }
 
 void FreeDrawingItem::onPathUpdate()
-{
-	m_path.lineTo(getCurrentPathPt());
-}
+{ m_path.lineTo(getCurrentPathPt()); }
 
 QRectF FreeDrawingItem::getLimitRect() const
-{
-	return m_path.boundingRect();
-}
+{ return m_path.boundingRect(); }
 
 void FreeDrawingItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
-{
-	painter->drawPath(m_path);
-}
+{ painter->drawPath(m_path); }

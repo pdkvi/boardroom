@@ -1,9 +1,4 @@
-﻿#include "WhiteboardToolsModel.hpp"
-
-void WhiteboardToolsModel::addTool(ITool::id_t id)
-{
-	m_toolsId.push_back(ToolRegistry::getItem(id));
-}
+#include "WhiteboardToolsModel.hpp"
 
 int WhiteboardToolsModel::rowCount(QModelIndex const& parent) const
 {

@@ -1,12 +1,16 @@
-﻿#include "TriangleItem.hpp"
+#include "TriangleItem.hpp"
 
 #include <QVector2D>
 #include <QPainter>
 
+std::unique_ptr<ToolItemBase> TriangleItem::clone() const
+{ return std::make_unique<this_t>(); }
+
+ToolItemBase::id_t TriangleItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString TriangleItem::getName() const
-{
-	return "Triangle";
-}
+{ return "Triangle"; }
 
 QRectF TriangleItem::getLimitRect() const
 {

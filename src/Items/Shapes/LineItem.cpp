@@ -1,11 +1,15 @@
-﻿#include "LineItem.hpp"
+#include "LineItem.hpp"
 
 #include <QPainter>
 
+std::unique_ptr<ToolItemBase> LineItem::clone() const
+{ return std::make_unique<this_t>(); }
+
+ToolItemBase::id_t LineItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString LineItem::getName() const
-{
-	return "Line";
-}
+{ return "Line"; }
 
 QRectF LineItem::getLimitRect() const
 {

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <unordered_map>
 #include <concepts>
@@ -9,6 +9,7 @@ concept Registered = requires(TBase * ptr)
 {
 	typename TBase::id_t;
 	{ ptr->clone().operator->() } -> std::convertible_to<TBase*>;
+	{ ptr->getId() } -> std::convertible_to<typename TBase::id_t>;
 };
 
 template <typename TBase> requires Registered<TBase>
@@ -37,4 +38,7 @@ public:
 
 		return s_tools[id];
 	}
+
+	template <typename TDerived> requires std::derived_from<TDerived, TBase>
+	static id_t getItemId() { return TDerived{}.getId(); }
 };

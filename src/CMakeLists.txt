@@ -26,16 +26,16 @@ add_executable(boardroom
 	"Commands/DrawCommand.hpp"
 	"Commands/DrawCommand.cpp"
 
-	"Tools/Core/ITool.hpp"
 	"Tools/Core/ToolBase.hpp"
+	"Tools/Core/ToolBase.cpp"
 
 	"Tools/ShapeTool.hpp"
 	"Tools/ShapeTool.cpp"
 	"Tools/PenTool.hpp"
 	"Tools/PenTool.cpp"
 
-	"Items/Core/IToolItem.hpp"
 	"Items/Core/ToolItemBase.hpp"
+	"Items/Core/ToolItemBase.cpp"
 
 	"Items/Shapes/LineItem.hpp"
 	"Items/Shapes/LineItem.cpp"

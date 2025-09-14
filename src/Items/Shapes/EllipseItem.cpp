@@ -1,11 +1,15 @@
-﻿#include "EllipseItem.hpp"
+#include "EllipseItem.hpp"
 
 #include <QPainter>
 
+std::unique_ptr<ToolItemBase> EllipseItem::clone() const
+{ return std::make_unique<this_t>(); }
+
+ToolItemBase::id_t EllipseItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString EllipseItem::getName() const
-{
-	return "Ellipse";
-}
+{ return "Ellipse"; }
 
 QRectF EllipseItem::getLimitRect() const
 {
