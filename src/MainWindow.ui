@@ -53,6 +53,7 @@
       <string>WhiteboardView</string>
      </property>
      <addaction name="whiteboardViewDebugRenderingAction"/>
+     <addaction name="whiteboardViewSpawnExternalMiminapAction"/>
     </widget>
     <addaction name="whiteboardViewDebugMenu"/>
    </widget>
@@ -79,6 +80,11 @@
    </property>
    <property name="text">
     <string>Debug rendering</string>
+   </property>
+  </action>
+  <action name="whiteboardViewSpawnExternalMiminapAction">
+   <property name="text">
+    <string>Spawn external minimap</string>
    </property>
   </action>
  </widget>
