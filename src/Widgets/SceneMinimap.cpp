@@ -4,7 +4,7 @@
 #include <QMouseEvent>
 
 SceneMinimap::SceneMinimap(QWidget* parent)
-	: base_t(parent), m_targetView(nullptr)
+	: base_t(parent), m_targetView(nullptr), m_viewRectColor(Qt::blue)
 {
 	setFrameShape(QFrame::Box);
 }
@@ -180,8 +180,15 @@ void SceneMinimap::paintTargetViewRect(QPainter& painter)
 		return;
 
 	painter.save();
-	painter.setPen(QColor(0, 0, 255, 128));
-	painter.setBrush(QColor(0, 0, 255, 64));
+
+	QColor penColor = m_viewRectColor;
+	penColor.setAlpha(128);
+	painter.setPen(penColor);
+
+	QColor brushColor = m_viewRectColor;
+	brushColor.setAlpha(64);
+	painter.setBrush(brushColor);
+
 	painter.drawRect(mapFromScene(targetViewRect));
 	painter.restore();
 }

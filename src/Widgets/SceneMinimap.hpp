@@ -13,6 +13,7 @@ class SceneMinimap : public QFrame
 
 private:
 	QGraphicsView* m_targetView;
+	QColor m_viewRectColor;
 
 public:
 	explicit SceneMinimap(QWidget* parent = nullptr);
