@@ -10,8 +10,10 @@
 #include "Utility/IdHolder.hpp"
 #include "Utility/Registry.hpp"
 
-class ToolBase
+class ToolBase : public SelectedConstruction
 {
+	friend Registry;
+
 	using this_t = ToolBase;
 
 public:
@@ -21,7 +23,7 @@ private:
 	id_t m_currentItemId = id_t{};
 
 public:
-	virtual ~ToolBase() = default;
+	~ToolBase() override = default;
 	virtual std::unique_ptr<ToolBase> clone() const = 0;
 
 	virtual id_t getId() const = 0;

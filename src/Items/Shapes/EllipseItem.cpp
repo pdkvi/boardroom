@@ -3,7 +3,7 @@
 #include <QPainter>
 
 std::unique_ptr<ToolItemBase> EllipseItem::clone() const
-{ return std::make_unique<this_t>(); }
+{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
 
 ToolItemBase::id_t EllipseItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }

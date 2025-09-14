@@ -3,7 +3,7 @@
 #include <QPainter>
 
 std::unique_ptr<ToolItemBase> LineItem::clone() const
-{ return std::make_unique<this_t>(); }
+{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
 
 ToolItemBase::id_t LineItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }

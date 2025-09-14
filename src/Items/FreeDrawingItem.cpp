@@ -4,7 +4,7 @@
 #include <QPainter>
 
 std::unique_ptr<ToolItemBase> FreeDrawingItem::clone() const
-{ return std::make_unique<this_t>(); }
+{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
 
 ToolItemBase::id_t FreeDrawingItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }

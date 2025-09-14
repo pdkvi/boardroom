@@ -16,7 +16,7 @@ PenTool::PenTool()
 }
 
 std::unique_ptr<ToolBase> PenTool::clone() const
-{ return std::make_unique<this_t>(); }
+{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
 
 ToolBase::id_t PenTool::getId() const
 { return ToolBase::getIdFromHolder<this_t>(); }

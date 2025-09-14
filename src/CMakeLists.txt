@@ -52,6 +52,7 @@ add_executable(boardroom
 	"Utility/IdHolder.hpp"
 	"Utility/Registry.hpp"
 	"Utility/SingleCall.hpp"
+	"Utility/SelectedConstruction.hpp"
 )
 
 set_target_properties(boardroom PROPERTIES

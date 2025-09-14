@@ -3,11 +3,14 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 
+#include "Utility/SelectedConstruction.hpp"
 #include "Utility/IdHolder.hpp"
 #include "Utility/Registry.hpp"
 
-class ToolItemBase : public QGraphicsItem
+class ToolItemBase : public QGraphicsItem, public SelectedConstruction
 {
+	friend Registry;
+
 	using this_t = ToolItemBase;
 
 public:

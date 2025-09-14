@@ -22,7 +22,7 @@ ShapeTool::ShapeTool()
 }
 
 std::unique_ptr<ToolBase> ShapeTool::clone() const
-{ return std::make_unique<this_t>(); }
+{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
 
 ToolBase::id_t ShapeTool::getId() const
 { return ToolBase::getIdFromHolder<this_t>(); }
