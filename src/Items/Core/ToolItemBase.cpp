@@ -1,5 +1,7 @@
 #include "Items/Core/ToolItemBase.hpp"
 
+#include <QPainter>
+
 QGraphicsItem* ToolItemBase::getSceneItem()
 { return this; }
 
@@ -38,8 +40,26 @@ QRectF ToolItemBase::boundingRect() const
 
 void ToolItemBase::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
 {
+	painter->save();
 	onPaint(painter, option, widget);
+	painter->restore();
+
 	m_limitRectBeforeRepaint = getLimitRect();
+}
+
+std::unique_ptr<ToolItemBase> ToolItemBase::clone() const
+{
+	auto thisCopy = getThisCopy();
+	copyTo(thisCopy.get());
+
+	return thisCopy;
+}
+
+void ToolItemBase::copyTo(ToolItemBase* target) const
+{
+	target->m_pathStartPt = m_pathStartPt;
+	target->m_currentPathPt = m_currentPathPt;
+	target->m_limitRectBeforeRepaint = m_limitRectBeforeRepaint;
 }
 
 void ToolItemBase::onPathStart()

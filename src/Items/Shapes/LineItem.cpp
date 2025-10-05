@@ -2,14 +2,14 @@
 
 #include <QPainter>
 
-std::unique_ptr<ToolItemBase> LineItem::clone() const
-{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
-
 ToolItemBase::id_t LineItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }
 
 QString LineItem::getName() const
 { return "Line"; }
+
+std::unique_ptr<ToolItemBase> LineItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QRectF LineItem::getLimitRect() const
 {
@@ -24,5 +24,6 @@ QRectF LineItem::getLimitRect() const
 
 void LineItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
 {
+	base_t::onPaint(painter, option, widget);
 	painter->drawLine(getStartPathPt(), getCurrentPathPt());
 }

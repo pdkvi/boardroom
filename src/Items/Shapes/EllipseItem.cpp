@@ -2,14 +2,14 @@
 
 #include <QPainter>
 
-std::unique_ptr<ToolItemBase> EllipseItem::clone() const
-{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
-
 ToolItemBase::id_t EllipseItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }
 
 QString EllipseItem::getName() const
 { return "Ellipse"; }
+
+std::unique_ptr<ToolItemBase> EllipseItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QRectF EllipseItem::getLimitRect() const
 {
@@ -24,7 +24,7 @@ QRectF EllipseItem::getLimitRect() const
 
 void EllipseItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
 {
-	painter->setPen(QPen(Qt::black, 1));
+	base_t::onPaint(painter, option, widget);
 
 	QRectF const ellipseRect = [&]
 	{

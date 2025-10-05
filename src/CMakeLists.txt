@@ -46,6 +46,9 @@ add_executable(boardroom
 	"Items/Shapes/TriangleItem.hpp"
 	"Items/Shapes/TriangleItem.cpp"
 
+	"Items/Core/DrawingItemBase.hpp"
+	"Items/Core/DrawingItemBase.cpp"
+
 	"Items/FreeDrawingItem.hpp"
 	"Items/FreeDrawingItem.cpp"
 

@@ -3,14 +3,14 @@
 #include <QVector2D>
 #include <QPainter>
 
-std::unique_ptr<ToolItemBase> TriangleItem::clone() const
-{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
-
 ToolItemBase::id_t TriangleItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }
 
 QString TriangleItem::getName() const
 { return "Triangle"; }
+
+std::unique_ptr<ToolItemBase> TriangleItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QRectF TriangleItem::getLimitRect() const
 {
@@ -25,6 +25,8 @@ QRectF TriangleItem::getLimitRect() const
 
 void TriangleItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
 {
+	base_t::onPaint(painter, option, widget);
+
 	QRectF const& rect = getLimitRect();
 
 	QPainterPath path;
