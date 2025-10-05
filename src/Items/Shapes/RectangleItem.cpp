@@ -20,6 +20,7 @@ QPainterPath RectangleItem::shape() const
 	QPointF const bottomRight = { std::max(x1, x2), std::max(y1, y2) };
 
 	QPainterPath path;
+	path.moveTo(getStartPathPt());
 	path.addRect(QRectF{ topLeft, bottomRight });
 
 	return path;

@@ -20,6 +20,7 @@ QPainterPath EllipseItem::shape() const
 	auto const [top, bottom] = std::tie(std::min(y1, y2), std::max(y1, y2));
 
 	QPainterPath path;
+	path.moveTo(getStartPathPt());
 	path.addEllipse(left, top, right - left, bottom - top);
 
 	return path;
