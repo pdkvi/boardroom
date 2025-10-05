@@ -2,10 +2,14 @@
 
 #include <QPainter>
 
+ToolItemBase::id_t RectangleItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString RectangleItem::getName() const
-{
-	return "Rectangle";
-}
+{ return "Rectangle"; }
+
+std::unique_ptr<ToolItemBase> RectangleItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QPainterPath RectangleItem::shape() const
 {

@@ -4,17 +4,18 @@
 #include <QGraphicsItem>
 #include <QPainter>
 
-#include "Items/Core/IToolItem.hpp"
-
+#include "Utility/SelectedConstruction.hpp"
 #include "Utility/IdHolder.hpp"
 #include "Utility/Registry.hpp"
 
-using ToolItemRegistry = Registry<IToolItem>;
-
-template <typename TToolItem>
-class ToolItemBase : public QGraphicsItem, public IToolItem
+class ToolItemBase : public QGraphicsItem, public SelectedConstruction
 {
-	using id_holder_t = IdHolder<IToolItem, TToolItem>;
+	friend Registry;
+
+	using this_t = ToolItemBase;
+
+public:
+	using id_t = size_t;
 
 private:
 	QPointF m_pathStartPt;
@@ -23,73 +24,47 @@ private:
 	QRectF m_limitRectBeforeRepaint;
 
 public:
-	ToolItemBase()
-	{
-		setFlag(ItemIsSelectable);
-	}
+	ToolItemBase();
+	~ToolItemBase() override = default;
 
-	static id_t getToolItemId()
+	virtual std::unique_ptr<ToolItemBase> clone() const;
+	virtual void copyTo(ToolItemBase* target) const;
+
+	virtual id_t getId() const = 0;
+	virtual QString getName() const = 0;
+
+	QGraphicsItem* getSceneItem();
+
+	void startPath(QPointF const& pos);
+	void updatePath(QPointF const& pos);
+	void endPath(QPointF const& pos);
+
+	QRectF boundingRect() const final;
+	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) final;
+
+protected:
+	virtual std::unique_ptr<ToolItemBase> getThisCopy() const = 0;
+
+	template <typename TDerived> requires std::derived_from<TDerived, this_t>
+	static std::unique_ptr<ToolItemBase> getThisCopyImpl()
+	{ return std::make_unique<SelectedConstructionImpl<TDerived>>(); }
+
+	template <typename TDerived> requires std::derived_from<TDerived, this_t>
+	static id_t getIdFromHolder()
 	{
-		auto const & holder = id_holder_t::getInstance();
+		auto const& holder = IdHolder<this_t, TDerived>::getInstance();
 		return holder.getId();
 	}
 
-	id_t getId() const override { return getToolItemId(); }
+	QPointF getStartPathPt() const;
+	QPointF getCurrentPathPt() const;
 
-	std::unique_ptr<IToolItem> clone() const override { return std::make_unique<TToolItem>(); }
+	virtual void onPathStart();
+	virtual void onPathUpdate();
+	virtual void onPathEnd();
 
-	QGraphicsItem* getSceneItem() final { return this; }
-
-	void startPath(QPointF const& pos) final
-	{
-		m_pathStartPt = m_currentPathPt = pos;
-		onPathStart();
-
-		m_limitRectBeforeRepaint = getLimitRect();
-		update();
-	}
-
-	void updatePath(QPointF const& pos) final
-	{
-		m_currentPathPt = pos;
-		onPathUpdate();
-
-		update();
-	}
-
-	void endPath(QPointF const& pos) final
-	{
-		m_currentPathPt = pos;
-		onPathEnd();
-
-		if (QGraphicsScene* scene = this->scene())
-		{
-			scene->removeItem(getSceneItem());
-			scene->addItem(getSceneItem());
-			scene->update();
-		}
-	}
-
-	QRectF boundingRect() const final { return m_limitRectBeforeRepaint; }
-
-	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) final
-	{
-		onPaint(painter, option, widget);
-		m_limitRectBeforeRepaint = getLimitRect();
-	}
-
-protected:
-	virtual void onPathStart() {}
-	virtual void onPathUpdate() {}
-	virtual void onPathEnd() { onPathUpdate(); }
-
-	QPointF getStartPathPt() const { return m_pathStartPt; }
-	QPointF getCurrentPathPt() const { return m_currentPathPt; }
-
-	virtual QRectF getLimitRect() const { return shape().boundingRect(); };
-
-	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
-	{
-		painter->drawPath(shape());
-	}
+	virtual QRectF getLimitRect() const;
+	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget);
 };
+
+using ToolItemRegistry = Registry<ToolItemBase>;

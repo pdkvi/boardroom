@@ -1,9 +1,16 @@
 #include "TriangleItem.hpp"
 
+#include <QVector2D>
+#include <QPainter>
+
+ToolItemBase::id_t TriangleItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString TriangleItem::getName() const
-{
-	return "Triangle";
-}
+{ return "Triangle"; }
+
+std::unique_ptr<ToolItemBase> TriangleItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QPainterPath TriangleItem::shape() const
 {

@@ -1,4 +1,6 @@
-﻿#include "MainWindow.hpp"
+#include "MainWindow.hpp"
+
+#include <QDialog>
 
 #include "WhiteboardToolsModel.hpp"
 #include "WhiteboardScene.hpp"
@@ -17,9 +19,26 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(m_ui->whiteboardViewDebugRenderingAction, &QAction::toggled,
 		m_ui->whiteboardView, &WhiteboardView::setDebugRenderingEnabled);
 
+	connect(m_ui->whiteboardViewSpawnExternalMiminapAction, &QAction::triggered, m_ui->whiteboardView, [=]()
+	{
+		auto* minimapDialog = new QDialog(this);
+		minimapDialog->setAttribute(Qt::WA_DeleteOnClose);
+
+		auto* minimap = new SceneMinimap;
+		minimap->setMinimumSize(100, 100);
+		minimap->setTargetView(m_ui->whiteboardView);
+
+		auto* layout = new QHBoxLayout(minimapDialog);
+		layout->setContentsMargins(0, 0, 0, 0);
+		layout->addWidget(minimap);
+
+		minimapDialog->resize(400, 400);
+		minimapDialog->show();
+	});
+
 	auto* toolsModel = new WhiteboardToolsModel;
-	toolsModel->addTool(PenTool::getToolId());
-	toolsModel->addTool(ShapeTool::getToolId());
+	toolsModel->addTool<PenTool>();
+	toolsModel->addTool<ShapeTool>();
 
 	m_ui->toolsView->setModel(toolsModel);
 
@@ -30,7 +49,7 @@ MainWindow::MainWindow(QWidget* parent)
 			QAbstractItemModel const* model = m_ui->toolsView->model();
 
 			QVariant const data = model->data(current, WhiteboardToolsModel::ItemRole::Data);
-			auto const tool = data.value<std::shared_ptr<ITool const>>();
+			auto const tool = data.value<std::shared_ptr<ToolBase const>>();
 
 			m_ui->whiteboardView->setCurrentTool(tool->clone());
 		}

@@ -2,10 +2,14 @@
 
 #include <QPainter>
 
+ToolItemBase::id_t EllipseItem::getId() const
+{ return ToolItemBase::getIdFromHolder<this_t>(); }
+
 QString EllipseItem::getName() const
-{
-	return "Ellipse";
-}
+{ return "Ellipse"; }
+
+std::unique_ptr<ToolItemBase> EllipseItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QPainterPath EllipseItem::shape() const
 {
