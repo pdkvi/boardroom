@@ -12,7 +12,7 @@ private:
 	qreal m_thickness;
 
 public:
-	explicit DrawingItemBase(QColor color = Qt::darkBlue, qreal thickness = 15.0);
+	explicit DrawingItemBase(QColor color = Qt::darkBlue, qreal thickness = 2.0);
 
 	void copyTo(ToolItemBase* target) const override;
 
