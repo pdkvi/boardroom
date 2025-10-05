@@ -27,6 +27,8 @@ set_target_properties(boardroom PROPERTIES
 
 	WIN32_EXECUTABLE YES
 	MACOSX_BUNDLE YES
+
+	CXX_SCAN_FOR_MODULES OFF
 )
 
 target_include_directories(boardroom PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
