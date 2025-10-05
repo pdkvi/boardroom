@@ -12,10 +12,11 @@ private:
 	qreal m_thickness;
 
 public:
-	DrawingItemBase(QColor color = Qt::darkBlue, qreal thickness = 2.0);
+	explicit DrawingItemBase(QColor color = Qt::darkBlue, qreal thickness = 2.0);
 
 	void copyTo(ToolItemBase* target) const override;
 
 protected:
+	QRectF getLimitRect() const override;
 	void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
 };

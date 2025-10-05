@@ -2,6 +2,26 @@
 
 #include <QPainter>
 
+ToolItemBase::ToolItemBase()
+{
+	setFlag(ItemIsSelectable);
+}
+
+std::unique_ptr<ToolItemBase> ToolItemBase::clone() const
+{
+	auto thisCopy = getThisCopy();
+	copyTo(thisCopy.get());
+
+	return thisCopy;
+}
+
+void ToolItemBase::copyTo(ToolItemBase* target) const
+{
+	target->m_pathStartPt = m_pathStartPt;
+	target->m_currentPathPt = m_currentPathPt;
+	target->m_limitRectBeforeRepaint = m_limitRectBeforeRepaint;
+}
+
 QGraphicsItem* ToolItemBase::getSceneItem()
 { return this; }
 
@@ -47,20 +67,11 @@ void ToolItemBase::paint(QPainter* painter, QStyleOptionGraphicsItem const* opti
 	m_limitRectBeforeRepaint = getLimitRect();
 }
 
-std::unique_ptr<ToolItemBase> ToolItemBase::clone() const
-{
-	auto thisCopy = getThisCopy();
-	copyTo(thisCopy.get());
+QPointF ToolItemBase::getStartPathPt() const
+{ return m_pathStartPt; }
 
-	return thisCopy;
-}
-
-void ToolItemBase::copyTo(ToolItemBase* target) const
-{
-	target->m_pathStartPt = m_pathStartPt;
-	target->m_currentPathPt = m_currentPathPt;
-	target->m_limitRectBeforeRepaint = m_limitRectBeforeRepaint;
-}
+QPointF ToolItemBase::getCurrentPathPt() const
+{ return m_currentPathPt; }
 
 void ToolItemBase::onPathStart()
 {}
@@ -71,8 +82,9 @@ void ToolItemBase::onPathUpdate()
 void ToolItemBase::onPathEnd()
 { onPathUpdate(); }
 
-QPointF ToolItemBase::getStartPathPt() const
-{ return m_pathStartPt; }
+QRectF ToolItemBase::getLimitRect() const
+{ return shape().boundingRect(); }
 
-QPointF ToolItemBase::getCurrentPathPt() const
-{ return m_currentPathPt; }
+void ToolItemBase::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
+{ painter->drawPath(shape()); }
+

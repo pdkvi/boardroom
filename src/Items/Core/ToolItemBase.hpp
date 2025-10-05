@@ -2,6 +2,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QPainter>
 
 #include "Utility/SelectedConstruction.hpp"
 #include "Utility/IdHolder.hpp"
@@ -23,6 +24,7 @@ private:
 	QRectF m_limitRectBeforeRepaint;
 
 public:
+	ToolItemBase();
 	~ToolItemBase() override = default;
 
 	virtual std::unique_ptr<ToolItemBase> clone() const;
@@ -61,8 +63,8 @@ protected:
 	virtual void onPathUpdate();
 	virtual void onPathEnd();
 
-	virtual QRectF getLimitRect() const = 0;
-	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) = 0;
+	virtual QRectF getLimitRect() const;
+	virtual void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget);
 };
 
 using ToolItemRegistry = Registry<ToolItemBase>;

@@ -15,6 +15,5 @@ public:
 protected:
 	std::unique_ptr<ToolItemBase> getThisCopy() const override;
 
-	QRectF getLimitRect() const override;
-	void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
+	QPainterPath shape() const override;
 };

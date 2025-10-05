@@ -16,13 +16,11 @@ public:
 
 	id_t getId() const override;
 	QString getName() const override;
+	QPainterPath shape() const override;
 
 protected:
 	std::unique_ptr<ToolItemBase> getThisCopy() const override;
 
 	void onPathStart() override;
 	void onPathUpdate() override;
-
-	QRectF getLimitRect() const override;
-	void onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) override;
 };

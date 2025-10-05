@@ -1,61 +1,23 @@
-add_executable(boardroom
+add_executable(boardroom)
+
+add_subdirectory("Commands")
+add_subdirectory("Items")
+add_subdirectory("Tools")
+add_subdirectory("Utility")
+add_subdirectory("Widgets")
+
+target_sources(boardroom PRIVATE
 	"main.cpp"
 
 	"MainWindow.hpp"
 	"MainWindow.cpp"
 	"MainWindow.ui"
 
-	"Widgets/SceneViewBase.hpp"
-	"Widgets/SceneViewBase.cpp"
-
-	"Widgets/InfiniteScrollGraphicsViewBase.hpp"
-	"Widgets/InfiniteScrollGraphicsViewBase.cpp"
-
-	"Widgets/WhiteboardView.hpp"
-	"Widgets/WhiteboardView.cpp"
-
-	"Widgets/SceneMinimap.hpp"
-	"Widgets/SceneMinimap.cpp"
-
 	"WhiteboardScene.hpp"
 	"WhiteboardScene.cpp"
 
 	"WhiteboardToolsModel.hpp"
 	"WhiteboardToolsModel.cpp"
-
-	"Commands/DrawCommand.hpp"
-	"Commands/DrawCommand.cpp"
-
-	"Tools/Core/ToolBase.hpp"
-	"Tools/Core/ToolBase.cpp"
-
-	"Tools/ShapeTool.hpp"
-	"Tools/ShapeTool.cpp"
-	"Tools/PenTool.hpp"
-	"Tools/PenTool.cpp"
-
-	"Items/Core/ToolItemBase.hpp"
-	"Items/Core/ToolItemBase.cpp"
-
-	"Items/Shapes/LineItem.hpp"
-	"Items/Shapes/LineItem.cpp"
-	"Items/Shapes/RectangleItem.hpp"
-	"Items/Shapes/RectangleItem.cpp"
-	"Items/Shapes/EllipseItem.hpp"
-	"Items/Shapes/EllipseItem.cpp"
-	"Items/Shapes/TriangleItem.hpp"
-	"Items/Shapes/TriangleItem.cpp"
-
-	"Items/Core/DrawingItemBase.hpp"
-	"Items/Core/DrawingItemBase.cpp"
-
-	"Items/FreeDrawingItem.hpp"
-	"Items/FreeDrawingItem.cpp"
-
-	"Utility/IdHolder.hpp"
-	"Utility/Registry.hpp"
-	"Utility/SingleCall.hpp"
-	"Utility/SelectedConstruction.hpp"
 )
 
 set_target_properties(boardroom PROPERTIES
@@ -65,6 +27,8 @@ set_target_properties(boardroom PROPERTIES
 
 	WIN32_EXECUTABLE YES
 	MACOSX_BUNDLE YES
+
+	CXX_SCAN_FOR_MODULES OFF
 )
 
 target_include_directories(boardroom PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
