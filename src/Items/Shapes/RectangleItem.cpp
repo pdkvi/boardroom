@@ -2,14 +2,14 @@
 
 #include <QPainter>
 
-std::unique_ptr<ToolItemBase> RectangleItem::clone() const
-{ return std::make_unique<SelectedConstructionImpl<this_t>>(); }
-
 ToolItemBase::id_t RectangleItem::getId() const
 { return ToolItemBase::getIdFromHolder<this_t>(); }
 
 QString RectangleItem::getName() const
 { return "Rectangle"; }
+
+std::unique_ptr<ToolItemBase> RectangleItem::getThisCopy() const
+{ return getThisCopyImpl<this_t>(); }
 
 QRectF RectangleItem::getLimitRect() const
 {
@@ -23,4 +23,7 @@ QRectF RectangleItem::getLimitRect() const
 }
 
 void RectangleItem::onPaint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget)
-{ painter->drawRect(getLimitRect()); }
+{
+	base_t::onPaint(painter, option, widget);
+	painter->drawRect(getLimitRect());
+}

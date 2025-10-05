@@ -25,7 +25,8 @@ private:
 public:
 	~ToolItemBase() override = default;
 
-	virtual std::unique_ptr<ToolItemBase> clone() const = 0;
+	virtual std::unique_ptr<ToolItemBase> clone() const;
+	virtual void copyTo(ToolItemBase* target) const;
 
 	virtual id_t getId() const = 0;
 	virtual QString getName() const = 0;
@@ -40,6 +41,12 @@ public:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) final;
 
 protected:
+	virtual std::unique_ptr<ToolItemBase> getThisCopy() const = 0;
+
+	template <typename TDerived> requires std::derived_from<TDerived, this_t>
+	static std::unique_ptr<ToolItemBase> getThisCopyImpl()
+	{ return std::make_unique<SelectedConstructionImpl<TDerived>>(); }
+
 	template <typename TDerived> requires std::derived_from<TDerived, this_t>
 	static id_t getIdFromHolder()
 	{
